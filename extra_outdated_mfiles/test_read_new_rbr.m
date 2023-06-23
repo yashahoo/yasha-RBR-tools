@@ -1,0 +1,111 @@
+clear all;
+clc;
+close all;
+
+% required [contained in yasha_RBR_tools]:
+% t-tide
+% rotateXlabels
+% subaxis
+% exportfig
+% lanczosfilter
+% oceanlyz toolbox [optional] https://oceanlyz.readthedocs.io/en/latest/
+% and some others including rbr rsk-tools
+
+
+restoredefaultpath % this just fixes if there are any conflicting functions
+
+% set the paths here relevant to your computer
+% addpath(genpath('/Users/Yasha/Documents/MATLAB/m-files/yashatools/yasha_RBR_tools')); % [edit]  this should contain all the functions you need, except the rsk-tooks that are required to read the raw data (see below)
+% % addpath(genpath('/Users/Yasha/Documents/MATLAB/m-files/rbr-rsktools-2.3.0')); %  [edit] this should be installed on your computer somewhere (it has been tested ususing old version)
+% addpath(genpath('/Users/Yasha/Documents/MATLAB/m-files/rbr-rsktools')); % use this old version to ensure it reads temperature!
+
+% this should work if you run it from the yasha_RBR_tools directory
+addpath(genpath(pwd))
+addpath(genpath('rbr-rsktools'))
+%%
+
+rawfile='/Volumes/Margs_Clone/Pressure_sensor_data/RBRpressure_sensors/SN_206854_20230403_chari_new/206854_20230403_1218.rsk'
+location='chari'
+%-------------------------------------------------------------------------%
+%        set where to save figures and data
+%-------------------------------------------------------------------------%
+
+whereput=[rawfile(1:end-4) '_' location '_processed_NO_waves']; % this saves to same directory where rsk file located        
+mkdir(whereput);
+
+%%-------------------------------------------------------------------------%
+%%-------------------------------------------------------------------------%
+%%      read rsk, create netcdf and begin processing
+%%-------------------------------------------------------------------------%
+%%-------------------------------------------------------------------------%
+tic
+if isempty( regexp( rawfile, filesep, 'start' )) ;
+    nopath=1;
+else
+    nopath=0;
+end
+
+if nopath>0
+    filebase=rawfile(1:end-4);
+else
+    naminds=regexp( rawfile, filesep, 'start' ) ;
+filebase=rawfile(naminds(length(naminds))+1:length(rawfile)-4); % yh
+end
+% 
+% filebase=rawfile(naminds(length(naminds))+1:length(rawfile)-4);
+ncref=[whereput filesep filebase '_' location '.nc'];
+
+
+
+% check that nc file doesnt yet exist, delete if it does
+if isfile(ncref) %exist(ncref,'file') %exist('ncref','var')
+    disp('Netcdf output file already exists, delete it?')
+    
+    promptMessage = sprintf('OVERWRITE netcdf output file or QUIT?');
+    promptTitle = sprintf('Netcdf file exists');
+    button = questdlg(promptMessage,promptTitle,'Quit','OVERWRITE','Quit');
+    if strcmpi(button, 'Quit')
+        close all
+        return; % Or break or continue
+    elseif strcmpi(button, 'OVERWRITE')
+        disp(['Deleting: ' ncref])
+        delete(ncref)
+        clear ncref
+    end
+    %     disp(['Deleting: ' ncref])
+    
+end
+
+disp('Previewing rsk file...')
+% read raw file and save to netcdf
+[ncref]=read_RBRyh(rawfile,location,whereput);
+% ncref='/Volumes/Margs_Clone/RBRpressure_sensors/SN202078_Smiths_20210409/202078_20210409_1525_processed/202078_20210409_1525.nc'
+
+%
+% % % this used later
+% ncref=[whereput '/' rawfile(end-23:end-4) '.nc'];
+close all;
+
+% % % % % fix broken time
+% % % % load('east_busso_offset.mat')
+% % % % ts=ncread(ncref,'time')+datenum(2000,1,1)+dt;
+% % % % raw_ts=ncread(ncref,'time')+datenum(2000,1,1)+dt;
+
+ts=ncread(ncref,'time')+datenum(2000,1,1);
+raw_ts=ncread(ncref,'time')+datenum(2000,1,1);
+raw_press=ncread(ncref,'press');
+instrument=ncreadatt(ncref,'/','Serial_Number'); % serial number here for id
+
+try
+    Offset_from_UTC=ncreadatt([ncref],'time','Offset_from_UTC')
+catch
+    disp('Offset_from_UTC not available')
+end
+
+try
+    % temp=ncread([dir_ref ncref],'temperature');
+    temp=ncread([ncref],'temperature');
+catch
+    disp('Temperature not available')
+end
+

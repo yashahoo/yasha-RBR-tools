@@ -1,0 +1,31 @@
+% concatinate hourly outputs (monthly) from wave analysis or stirling
+% created by process_Stirling_waves_sealevel_v9.m into year data.
+
+
+
+
+
+
+co=0;
+for mo=5:12
+    co=co+1;
+    d(co)=dir(['/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2020_Stirling_CLEANED_v2/2020' sprintf('%02.f',mo) '_Cleaned_pressure_data_Stirling_processed_zerocross/FPA_pressure_sensor_Stirling_PROCESSED_DATA_2020' sprintf('%02.f',mo) '*']);
+end
+
+
+m=matfile([d(1).folder filesep d(1).name]); % get first data to start concatinating
+d(1).name
+T=m.T; %Waves_output_Table
+for i=2:length(d)
+    d(i).name
+    m=matfile([d(i).folder filesep d(i).name]);
+    tmp=m.T;
+    
+    T=vertcat(T,tmp);
+    
+end
+
+
+
+ figure; plot(datenum(T.timestr),T.sub_press);datetick
+ title([num2str(m.subsample_mins

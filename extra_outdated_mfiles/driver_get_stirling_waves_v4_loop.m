@@ -1,0 +1,722 @@
+ 
+% Yasha Hetzel 1 December 2022
+% driver_get_stirling_waves_v3_loop.m
+% Read and calculate waves for chari from Cockburn Sound Stirling channel
+% marker data from Fremantle Ports
+% input files are hourly log files with 2Hz freq
+% should run from within yasha-RBR_tools_v8 directory
+% requirements:
+% import_pressure_logfiles.m
+% updated autospec.m
+% updated get_chari_wave_analysis.m
+% For details see: https://oceanlyz.readthedocs.io/en/latest/
+
+
+
+clear all;
+clc;
+close all;
+
+
+
+restoredefaultpath % this just fixes if there are any conflicting functions
+
+
+% % should work if you run it from the yasha_RBR_tools_v7 directory
+% these are not required:
+% addpath(genpath(pwd))
+% addpath(genpath('rbr-rsktools'))
+
+%%-------------------------------------------------------------------------%
+%%                          Settings
+%%-------------------------------------------------------------------------%
+
+years2do = [2020] % [2017 2018] % can be vector of years (for loop)
+months2do = [8] %[7 8]   % can be vector of months (e.g. [1:12] for loop)
+
+input_directory='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/2020-08-31T14-00'
+output_directory=['/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves']
+
+% move problematic files to here:
+error_folder='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/2020-08-31T14-00/error_folder'
+%%-------------------------------------------------------------------------%
+%            Wave calculation - choose methods
+%%-------------------------------------------------------------------------%
+calculate_waves_both_methods = 'N'  % set this to Y if you want to use both ocn toolbox and chari method if 'N' will default to individual calculate_waves methods set below
+use_corrected_sealevel='N' % 'Y' if you want to use data corrected for pressure response in ocn_toolbox and chari_method. 'N' if you don't want to correct for presssure attenuation. If 'Y' must check detailed ocn settings below (lines 138+) to make sure water depth and sensor ht are correct and InputType='pressure' & OutputType='wave+waterlevel'.
+
+% [set this if calculate_waves_both_methods = 'N' above]
+calculate_waves='chari_method' %'ocn_toolbox' %'chari_method' % 'ocn_toolbox'
+
+
+% NOTE:  cutoff frequencies must be set in get_chari_wave_analysis.m (lines 73-77)
+% now they are set to 8sec to separate sea/swell and 20-200 secs for IG waves
+%%-------------------------------------------------------------------------%
+%            Wave calculation settings
+%%-------------------------------------------------------------------------%
+
+burst_duration='All';  % Interval of time window (in seconds) over which to calculate waves (must be <= number of samples in file)
+% If set to 'All' will use complete file data window (~1 hr) with  burst_duration=length(ts)/fs
+%%-------------------------------------------------------------------------%
+% The following settings are hardcoded in get_chari_wave_analysis.m, edit
+% them there if required
+
+% dof=4;			        % required degrees of freedom for the spectra
+% tcut=0.0033; %0.005;		% cutoff frequency for long term trend 300s
+% icut=0.033; %0.05;		% cutoff frequency for infragravity waves 30 s
+% scut=0.125; %0.15;	    % cutoff frequency for swell waves 8sec not 6.67 secs
+% wcut=0.5;		            % cutoff frequency for wind waves  2 sec
+%%-------------------------------------------------------------------------%
+%             Plotting settings [not yet implemented]
+%%-------------------------------------------------------------------------%
+% plot_figs='N'
+% save_matfig= 'N'
+% print_fig= 'N'
+% use_export_fig= 'N'
+% img_type='png'
+% fname   = 'test'
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                      READ DATA FILES (loop)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+mkdir(output_directory)
+mkdir(error_folder)
+
+for year = years2do
+    d=[];
+    tic
+    for month = months2do
+        
+        % if want to loop through files use this
+        %         fdir='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/'
+        % d=dir([fdir '*.log'])
+        fdir=input_directory; %rename
+        d=dir([fdir filesep num2str(year) '-' sprintf('%02d',month) '*.log'])
+        
+        if isempty(d)
+            disp(['No files for: ' num2str(year) '-' sprintf('%02d',month) ])
+            continue
+        end
+        
+        dat=[];ts=[];p=[];co=0;
+        
+        %create a logfile for each month
+        
+        fid = fopen([output_directory filesep num2str(year) '-' sprintf('%02d',month) '_processing_log.txt'], 'a');
+        if fid == -1
+            error('Cannot open log file.');
+        end
+        yourMsg = ' Starting processing.'
+        fprintf(fid, '%s: %s\n', datestr(now, 0), yourMsg);
+        % fclose(fid);
+        
+        
+        % make data matrices to fill
+%         logfilename= cell(length(d),1); % this doesnt work!!
+        logfilename= repmat({''},length(d),1);
+        number_samples= NaN(length(d),1);
+        Htime= NaN(length(d),1);
+        Hdat=  NaN(length(d),8);
+        Hs=  NaN(length(d),1);
+        % for ocn
+        ocn_number_samples= NaN(length(d),1);
+        ocn_Htime= NaN(length(d),1);
+        ocn_Hs=NaN(length(d),1);
+        ocn_Hs_uncorrected=NaN(length(d),1);
+        ocn_Hdat=NaN(length(d),8);
+        
+        num_infiles=length(d);
+        
+        
+        for fi=1:length(d);
+            
+            co=co+1;
+            
+            lastwarn('');% Clear last warning message
+            filename=[d(fi).folder filesep d(fi).name]
+            
+            
+            % or else set individual filenames below and comment fi loop out
+            % filename='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/2017-07-06T10-00.log';
+            % filename='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/2018-08-06T15-00.log';
+            %%-------------------------------------------------------------------------%
+            %                       read data
+            %%-------------------------------------------------------------------------%
+            %             save logfilename [before loop breaks or removes error files]
+            logfilename{co} = d(fi).name ;
+            
+            
+            
+            [dat ts p] = import_pressure_logfiles(filename);
+            p=p-10.1325; % remove mean atm pressure. It would be better if you had observations. I have them for this period but there are a few gaps so probably not best. If you are just calculating waves it doesnt matter.
+            [warnMsg, warnId] = lastwarn;
+            if ~isempty(warnMsg)
+                yourMsg =[d(fi).name ' is either bad or missing...Skipping and moving to error_folder/'];
+                warning(yourMsg)
+                fprintf(fid, '%s: %s\n', datestr(now, 0), yourMsg);
+                movefile(filename,[error_folder filesep])
+                continue;
+                
+            end
+            
+%  [yh 20230404 redundant?]           p=p-10.1325; % remove mean atm pressure. It would be better if you had observations. I have them for this period but there are a few gaps so probably not best. If you are just calculating waves it doesnt matter.
+           
+            % check for NaNs
+            percgood=sum(~isnan(p))./length(p);
+            warning on
+            if percgood<1.0 & percgood>0.99
+                yourMsg =[d(fi).name '--Only ' sprintf('%0.2f',100*percgood) ' % good data...replacing NaNs with mean'];
+                warning(yourMsg)
+                fprintf(fid, '%s: %s\n', datestr(now, 0), yourMsg);
+                p(isnan(p))=mean(p,'omitnan');
+            elseif percgood<0.99
+                yourMsg =[d(fi).name '--Only ' sprintf('%0.2f',100*percgood) ' % good data in: ' d(fi).name ' Skipping this file!!!!'];
+                warning(yourMsg)
+                fprintf(fid, '%s: %s\n', datestr(now, 0), yourMsg)
+                continue
+            end
+            
+            
+            %% ------------------------------------------------------------------------%
+            %            Wave calculation settings [for chari methods]
+            %%-------------------------------------------------------------------------%
+            % calculate_waves='chari_method' % [comment out if using ocn toolbox]
+            srate=2; % sample rate in hertz  [for chari method]
+            burst_duration= floor(length(ts)/srate); %2048 %3598 % 3600 %length(ts)/srate
+            % calculate_waves='ocn_toolbox'  [comment out if using chari method]
+            
+            %% ------------------------------------------------------------------------%
+            %      Wave calculation settings [for oceanlyz toolbox]
+            %             default settings can be left 'as is'
+            %%-------------------------------------------------------------------------%
+            % calculate_waves='ocn_toolbox'
+            InputType='pressure'; %'waterlevel' %'pressure' %'waterlevel' %'pressure' %'waterlevel' %'pressure'              % Data input ['pressure'] or  'waterlevel'. If pressure, the signal attenuation with depth will be applied [recommended].
+            OutputType='wave+waterlevel'; %'wave+waterlevel' %'wave' %'wave+waterlevel'       % ['wave'], ['wave+waterlevel'];
+            AnalysisMethod='spectral';         % Wave calculation method. 'zerocross' or 'spectral'. use zerocross if you want Hs, but very similar to Hm0 and swell/sea are useful. Leave as spectral for this method
+            fs=2;                             % instrument sample rate  in Hz
+            site_depth=10;                      % approx depth of site (m) (seabed to surface)
+            heightfrombed=8 ;%site_depth-1 ;  % [Default=0]   % height of instrument above bed (m). Only required if ocn.InputType='pressure' and ocn.AnalysisMethod='spectral'.If unknown assume = 0
+            dispout='no';                     % Display output of calculations at each burst ('yes or 'no')
+            Rho=1024;                         % Seawater density (Varies)
+            SeparateSeaSwell='yes' ;           % 'yes or 'no' (only works with spectral)
+            fmaxswell=1/8 ;%0.25;              % Maximum swell frequency (spectral only). 1/Period (ie. minimum period a swell can have). It should be between 0 and (fs/2). Only required if SeparateSeaSwell='yes' and AnalysisMethod='spectral'
+            fpminswell=1/25 ;%0.1;             % Minimum swell frequency (spectral only)
+            max_period= 25;                   % max period to use in wave calculations and filtering
+            
+            switch burst_duration
+                case 'All'
+                    
+                    burst_duration= floor(length(ts)/srate); %3599 %3600 15*60 ;       % Interval of time window (in seconds) over which to calculate waves (must be <= number of samples in file)
+                    disp(['Using complete data range for burst_duration = ' num2str(burst_duration)])
+            end
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %%  Use OceanLyz wave toolbox
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            
+            switch calculate_waves_both_methods
+                case 'Y'
+                    calculate_waves='ocn_toolbox' % force to use ocn_toolbox
+            end
+            
+            switch calculate_waves
+                case 'ocn_toolbox'
+                    
+                    n_bursts=floor(length(ts)./(burst_duration*fs));
+                    samples=burst_duration*fs;
+                    
+                    coun=0;
+                    for i=1:n_bursts
+                        
+                        i1=coun*samples+1;
+                        i2=i1+samples-1;
+                        burst_times(i)=mean(ts(i1:i2));
+                        coun=coun+1;
+                    end
+                    
+                    %add path for OCEANLYZ folder
+                    addpath(genpath('oceanlyz_2_0'));
+                    % cd('oceanlyz_2_0')
+                    
+                    %Create OCEANLYZ object
+                    clear ocn %Optional
+                    ocn=oceanlyz;
+                    
+                    %Read data
+                    current_folder=pwd;                  % Current (OCEANLYZ) path
+                    
+                    
+                    
+                    %        catch case where use_corrected_sealevel='N' & InputType='pressure'
+                    warning on
+                    if strcmpi(use_corrected_sealevel,'N') & strcmpi(InputType, 'pressure')
+                        InputType='waterlevel';
+                        OutputType='wave';
+                        warning('Set InputType=waterlevel and NOT correcting for pressure attenuation!!')
+                        warning('Set    OutputType=wave   and NOT correcting for pressure attenuation!!')
+                    end
+                    
+                    
+                    switch InputType
+                        case 'pressure'
+                            water_pressure=p*10000; %              % Load data and convert to appropriate units
+                        case 'waterlevel'
+                            water_pressure=p;
+                    end
+                    % cd(current_folder)                   % Change current path to OCEANLYZ folder
+                    water_pressure=water_pressure(1:n_bursts*burst_duration*fs);
+                    
+                    %Input parameters
+                    ocn.data= water_pressure;
+                    ocn.InputType=InputType; %'pressure' %'waterlevel';
+                    ocn.OutputType=OutputType; %'wave' %'wave+waterlevel';
+                    ocn.AnalysisMethod=AnalysisMethod; %'spectral';
+                    ocn.n_burst=n_bursts;
+                    ocn.burst_duration=burst_duration; %3600;
+                    ocn.fs=fs;
+                    %     ocn.fmin=1/20
+                    %     ocn.fmax=ocn.fs/2;  %0.1250
+                    ocn.fmin=0.05;                    %Only required if ocn.AnalysisMethod='spectral'
+                    ocn.fmax=ocn.fs/2;                %Only required if ocn.AnalysisMethod='spectral'
+                    ocn.fmaxpcorrCalcMethod='auto';   %Only required if ocn.InputType='pressure' and ocn.AnalysisMethod='spectral'
+                    ocn.Kpafterfmaxpcorr='constant';  %Only required if ocn.InputType='pressure' and ocn.AnalysisMethod='spectral'
+                    ocn.fminpcorr=0.15;               %Only required if ocn.InputType='pressure' and ocn.AnalysisMethod='spectral'
+                    ocn.fmaxpcorr=0.55;               %Only required if ocn.InputType='pressure' and ocn.AnalysisMethod='spectral'
+                    ocn.heightfrombed=heightfrombed;   % %0.05;           %Only required if ocn.InputType='pressure' and ocn.AnalysisMethod='spectral'
+                    ocn.dispout=dispout;              %'no'
+                    ocn.Rho=1024;                     %Seawater density (Varies)
+                    
+                    % define inputs for separating sea and swell
+                    switch AnalysisMethod % cannot separate sea/swell with zero cross method, so check this.
+                        case 'zerocross'
+                            SeparateSeaSwell='no';
+                            ocn.SeparateSeaSwell=SeparateSeaSwell;
+                        case 'spectral'
+                            ocn.SeparateSeaSwell=SeparateSeaSwell;
+                    end
+                    % if SeparateSeaSwell='yes', define these:
+                    %maximum swell frequency
+                    ocn.fmaxswell= fmaxswell ;        %1/8 %0.25;
+                    %                                 Maximum frequency that swell can have (It is about 0.2 in Gulf of Mexico) in (Hz)
+                    %                                     It should be between 0 and (fs/2)
+                    %                                     Only required if SeparateSeaSwell='yes' and AnalysisMethod='spectral'
+                    
+                    %Minimum swell frequency
+                    ocn.fpminswell=fpminswell;       %1/25 0.1;
+                    %                                 Minimum frequency that swell can have (it is used for Tpswell calculation) in (Hz)
+                    %                                     It should be between 0 and (fs/2)
+                    %                                     Only required if SeparateSeaSwell='yes' and AnalysisMethod='spectral'
+                    
+                    
+                    
+                    
+                    
+                    %Run OCEANLYZ
+                    ocn.runoceanlyz()
+                    
+                    % cd ..
+                    
+                    ocn.wave
+                    
+                    %  if you want to save in a loop must save each output here
+                    % %         wavedata(fi)=ocn.wave;
+                    % % %         wavedata(fi).Eta=[];wavedata(fi).Burst_Data=[];
+                    % %         wavetimes(fi)=burst_times;
+                    
+                    
+                    
+                    %  save the data for the month
+                    %                     logfilename{co} = d(fi).name ;
+                    ocn_number_samples(co)=length(ocn.wave.Burst_Data);
+                    ocn_Htime(co) = burst_times ; %mean(ts);   %'yyyy-mm-dd HH:MM:ss.fff'
+                    ocn_Hs_uncorrected(co)=4*std(ocn.wave.Burst_Data); % uning uncorrected data
+                    
+                    if strcmpi(InputType, 'pressure');
+                        ocn_Hs(co)=4*std(ocn.wave.Eta); % using corrected data
+                    elseif strcmpi(InputType, 'waterlevel');
+                        ocn_Hs(co)=4*std(ocn.wave.Burst_Data);
+                    end
+                    
+                    ocn_Hdat(co,:)= [ocn.wave.Hm0  ocn.wave.Tp ocn.wave.Hm0swell ocn.wave.Tpswell ocn.wave.Hm0sea ocn.wave.Tpsea  ocn.wave.fp  ocn.wave.fseparation];
+                    ocn_colnames={'logfilename','ocn_number_samples','ocn_Time','ocn_Hs_uncorrected','ocn_Hs','ocn_Hm0','ocn_Tp','ocn_Hm0swell','ocn_Tpswell','ocn_Hm0sea','ocn_Tpsea','ocn_fp','ocn_fseparation'};
+                    
+            end
+            
+            %%-------------------------------------------------------------------------%
+            %% ------------------------------------------------------------------------%
+            
+            switch calculate_waves_both_methods
+                case 'Y'
+                    calculate_waves='chari_method' % force to also do chari way
+                    
+                    %                     if possible use corrected pressure record
+                    switch use_corrected_sealevel
+                        case 'Y'
+                            if strcmpi(InputType,'pressure')
+                                p=ocn.wave.Eta';
+                                disp(['Using corrrected pressure response for ' calculate_waves])
+                            else
+                                disp(['No corrrected pressure response data available for ' calculate_waves ' Check settings!!'])
+                                %                                 ERRMSG=['Error using corrected pressure!! ocn InputType = sealevel, change to pressure and re-run (line 138)'];
+                                %                                 error(ERRMSG)
+                                
+                                yourMsg =[d(fi).name '--Error using corrected pressure ocn InputType = sealevel, change to pressure and re-run (line 138)'];
+                                fprintf(fid, '%s: %s\n', datestr(now, 0), yourMsg)
+                                error(yourMsg)
+                                
+                                
+                            end
+                            
+                    end
+                    
+            end
+            
+            switch calculate_waves
+                case 'chari_method'
+                    %%-------------------------------------------------------------------------%
+                    %                     set the burst duration to be complete data range if desired
+                    switch burst_duration
+                        case 'All'
+                            
+                            burst_duration= floor(length(ts)/srate)%3599 %3600 15*60 ;       % Interval of time window (in seconds) over which to calculate waves (must be <= number of samples in file)
+                            disp(['Using complete data range for burst_duration = ' num2str(burst_duration)])
+                    end
+                    
+                    % % % [wavedata hs1  hm1 S Pstat]=get_chari_wave_analysis(ts,p,srate);
+                    try
+                        [wavedata hs1  hm1 S Pn Pstat]=get_chari_wave_analysis(ts,p,srate,burst_duration);
+                    catch
+                        yourMsg =[d(fi).name ' Failed get_chari_wave_analysis ...skipping and moving to error_folder/'];
+                        warning(yourMsg)
+                        fprintf(fid, '%s: %s\n', datestr(now, 0), yourMsg);
+                        movefile(filename,[error_folder filesep])
+                        continue;
+                        
+                    end
+                    
+                    
+                    Hs(co)=std(p)*4; % Sig wave height
+                    
+                    close
+                    % display wave results
+                    vars=  {'Tpeak' 'Tot_Var' 'Trend_Var' 'Inf_Var' 'Swell_Var' 'Wind_Var' 'Noise_Var' ...
+                        'Trend_Per' 'Inf_Per' 'Swell_Per' 'Wind_Per' 'Noise_Per' ...
+                        'Hrms' 'Trend_ht' 'Inf_ht' 'Swell_ht' 'Wind_ht' 'Noise_ht'};
+                    disp('-------------------------------------')
+                    disp(d(fi).name)
+                    disp(['Time: ' datestr(mean(ts))])
+                    disp('-------------------------------------')
+                    for k=1:length(Pstat); disp ([num2str(k) '. ' vars{k} ' ' num2str(Pstat(k))]);end
+                    disp ([num2str(k+1) '. Hs ' num2str(Hs(co))])
+                    
+                    
+                    
+                    logfilename{co} = d(fi).name ;
+                    number_samples(co)=length(ts);
+                    Htime(co) = mean(ts);   %'yyyy-mm-dd HH:MM:ss.fff'
+                    Hdat(co,:)= [Pstat([13 1 15 16 17 9 10 11])' ];
+                    colnames={'logfilename','number_samples','Time','Hs','Hrms','Tpeak','Inf_ht','Swell_ht','Wind_ht','Inf_Per','Swell_Per','Wind_Per'};
+                    
+            end
+            
+            % colnames={'logfilename','number samples','Date (UTC+8)','Hs','Hrms','Tpeak','Inf_ht','Swell_ht','Wind_ht','Inf_Per','Swell_Per','Wind_Per'};
+            % T=table(logfilename,number_samples, {datestr(Htime,'yyyy-mm-dd HH:MM:ss')},Hs,Hdat(1),Hdat(2),Hdat(3),Hdat(4),Hdat(5),Hdat(6),Hdat(7),Hdat(8),'VariableNames',colnames )
+            % 1.  Tpeak 19.6076
+            % 9.  Inf_Per 7.0107
+            % 10. Swell_Per 65.7913
+            % 11. Wind_Per 24.8755
+            % 13. Hrms 0.099935
+            % % % 14. Trend_ht 0.012975
+            % 15. Inf_ht 0.02646
+            % 16. Swell_ht 0.081059
+            % 17. Wind_ht 0.049843
+            %     Hs 0.14374
+            
+            
+        end % loop through files
+        
+        
+        %% write monthly (or however many input files you specified) combined  outputs
+        
+        
+        %          table
+        switch calculate_waves_both_methods
+            case 'Y'
+                combined_colnames={'logfilename','number_samples','Time','Hs','ocn_Hs_uncorrected','Hrms','Tpeak','Inf_ht','Swell_ht','Wind_ht','Inf_Per','Swell_Per','Wind_Per','ocn_Hs','ocn_Hm0','ocn_Tp','ocn_Hm0swell','ocn_Tpswell','ocn_Hm0sea','ocn_Tpsea','ocn_fp','ocn_fseparation'};
+                T=table(logfilename,number_samples, Htime,Hs,ocn_Hs_uncorrected,Hdat(:,1),Hdat(:,2),Hdat(:,3),Hdat(:,4),Hdat(:,5),Hdat(:,6),Hdat(:,7),Hdat(:,8),ocn_Hs,ocn_Hdat(:,1),ocn_Hdat(:,2),ocn_Hdat(:,3),ocn_Hdat(:,4),ocn_Hdat(:,5),ocn_Hdat(:,6),ocn_Hdat(:,7),ocn_Hdat(:,8),'VariableNames',combined_colnames)
+
+                outfname=[output_directory filesep num2str(year) sprintf('%02d',month) '_wave_data-ocn_toolbox-and-chari_method_Pcorr_' use_corrected_sealevel];
+                save(outfname,'T','num_infiles');
+                Tstr=table(logfilename,number_samples, datestr(Htime,'yyyy-mm-dd HH:MM:ss'),Hs,ocn_Hs_uncorrected,Hdat(:,1),Hdat(:,2),Hdat(:,3),Hdat(:,4),Hdat(:,5),Hdat(:,6),Hdat(:,7),Hdat(:,8),ocn_Hs,ocn_Hdat(:,1),ocn_Hdat(:,2),ocn_Hdat(:,3),ocn_Hdat(:,4),ocn_Hdat(:,5),ocn_Hdat(:,6),ocn_Hdat(:,7),ocn_Hdat(:,8),'VariableNames',combined_colnames)
+                writetable(Tstr,outfname,'Delimiter',',','QuoteStrings',false)
+                
+                
+            case 'N'
+                switch calculate_waves
+                    case 'ocn_toolbox'
+                        % ocn_colnames={'logfilename','ocn_number_samples','ocn_Time','ocn_Hs_uncorrected','ocn_Hs','ocn_Hm0','ocn_Tp','ocn_Hm0swell','ocn_Tpswell','ocn_Hm0sea','ocn_Tpsea','ocn_fp','ocn_fseparation'};
+                        T=table(logfilename,ocn_number_samples, ocn_Htime,ocn_Hs_uncorrected,ocn_Hs,ocn_Hdat(:,1),ocn_Hdat(:,2),ocn_Hdat(:,3),ocn_Hdat(:,4),ocn_Hdat(:,5),ocn_Hdat(:,6),ocn_Hdat(:,7),ocn_Hdat(:,8),'VariableNames',ocn_colnames )
+                        outfname=[output_directory filesep num2str(year) sprintf('%02d',month) '_wave_data_' calculate_waves '_Pcorr_' use_corrected_sealevel];
+                        save(outfname,'T','num_infiles');
+                        Tstr=table(logfilename,ocn_number_samples, datestr(ocn_Htime,'yyyy-mm-dd HH:MM:ss'),ocn_Hs_uncorrected,ocn_Hs,ocn_Hdat(:,1),ocn_Hdat(:,2),ocn_Hdat(:,3),ocn_Hdat(:,4),ocn_Hdat(:,5),ocn_Hdat(:,6),ocn_Hdat(:,7),ocn_Hdat(:,8),'VariableNames',ocn_colnames )  
+                        writetable(Tstr,outfname,'Delimiter',',','QuoteStrings',false)
+                        
+                        
+                    case 'chari_method'
+                        % colnames={'logfilename','number_samples','Time','Hs','Hrms','Tpeak','Inf_ht','Swell_ht','Wind_ht','Inf_Per','Swell_Per','Wind_Per'};
+                        T=table(logfilename,number_samples, Htime,Hs,Hdat(:,1),Hdat(:,2),Hdat(:,3),Hdat(:,4),Hdat(:,5),Hdat(:,6),Hdat(:,7),Hdat(:,8),'VariableNames',colnames )
+                        outfname=[output_directory filesep num2str(year) sprintf('%02d',month) '_wave_data_' calculate_waves '_Pcorr_' use_corrected_sealevel];
+                        save(outfname,'T','num_infiles');
+                        Tstr=table(logfilename,number_samples, datestr(Htime,'yyyy-mm-dd HH:MM:ss'),Hs,Hdat(:,1),Hdat(:,2),Hdat(:,3),Hdat(:,4),Hdat(:,5),Hdat(:,6),Hdat(:,7),Hdat(:,8),'VariableNames',colnames )
+                        writetable(Tstr,outfname,'Delimiter',',','QuoteStrings',false);
+                end
+        end
+        
+        
+        
+        disp(['Hourly wave data saved to mat and csv text files: ' outfname])
+        
+        yourMsg =['Hourly wave data saved to mat and csv text files: ' outfname];
+        fprintf(fid, '%s: %s\n', datestr(now, 0), yourMsg)
+        fclose(fid);
+        toc
+        
+    end    %loop through months
+    
+    
+    
+end % loop through years
+
+
+%% test plots
+
+figure; 
+plot(T.Time,T.Swell_ht);ylim([0 .6]);datetick;set(gca,'fontsize',14)
+hold on; plot(T.Time,T.Wind_ht)
+plot(T.Time,T.Inf_ht)
+plot(T.Time,T.Hs)
+legend('Swell_ht','Wind_ht','Inf_ht','Hs','interpreter','none')
+ylabel('Height (m)')
+datetick
+
+
+
+
+
+%% ------------------------------------------------------------------------%
+% ----------------------------Plots-------------------------------------- %
+%%-------------------------------------------------------------------------%
+
+%
+% switch plot_figs
+%     case 'Y'
+%         % make sure time is correct length
+%         burst_times=burst_times(1:size(ocn.wave.Burst_Data,1));
+%
+%         xlims=[ts(1) ts(end)]; % all
+%         xlims=[begin finish];% good
+%         xt=[xlims(1):xlims(2)];
+%         yt=[0:2:30];
+%         %
+%         % sp_corrected1=ocn.wave;
+%         % sep_swell= ocn.SeparateSeaSwell;
+%         switch AnalysisMethod
+%             case 'spectral'
+%
+%                 switch SeparateSeaSwell
+%                     case 'yes'
+%                         %         figure;
+%                         %         hold on;
+%                         %         plot(ocn.wave.Hm0swell);
+%                         %         plot(ocn.wave.Hm0sea);
+%                         %         plot(ocn.wave.Hm0,'k');
+%                         %         legend('swell','sea','Hm0');
+%                         %
+%                         %         figure;
+%                         %         hold on;
+%                         %
+%                         %         h1=plot(ocn.wave.Tp);
+%                         %         h2=plot(ocn.wave.Tpswell);
+%                         %         h3=plot(ocn.wave.Tpsea);
+%                         %         legend('Tp','swell','sea');
+%                         %         ylabel('Period (s)')
+%                         %
+%                         %         h1.Color=[0 0 0];
+%                         %         h2.Color=[ 0    0.4470    0.7410];
+%                         %         h3.Color=[0.8500    0.3250    0.0980];
+%
+%                         f=figure;
+%                         f.Position=[66 207 1600 450];
+%                         f.Color='w';
+%                         % set(gcf,'Position',[200 100 700 300])
+%                         % set(gcf,'PaperPositionMode','auto')
+%                         plot(burst_times,ocn.wave.Hm0swell)
+%                         hold on
+%                         plot(burst_times,ocn.wave.Hm0sea)
+%                         plot(burst_times,ocn.wave.Hm0,'k')
+%                         legend('Hm0swell','Hm0sea','Hm0')
+%                         ylabel('Wave height (m)')
+%                         set(gca,'xlim',xlims,'xtick',xt)
+%                         set(gca,'ylim',[0 ceil(max(ocn.wave.Hm0))])
+%                         datetick('x','mm/dd','keeplimits','keepticks')
+%                         rotateXLabels( gca(), 90 )
+%                         xlabel(datestr(mean(burst_times),'YYYY'))
+%                         title([instrument ' ' location ],'interpreter','none')
+%                         fname=[whereput '/' instrument '_' location '_WAVE_HEIGHT_' datestr(xlims(1),'yyyymmdd') '-' datestr(xlims(2),'yyyymmdd')];
+%                         % print('-dpng','-r200', fname);
+%                         % print('-dpdf', '-painters', fname);
+%                         %         export_fig(fname,'-pdf','-png','-transparent')
+%                         savefig2_ylh(save_matfig,print_fig,use_export_fig,img_type,fname)
+%
+%                         f=figure;
+%                         f.Position=[200 100 1600 450];
+%                         f.Color='w';
+%                         h1=plot(burst_times,ocn.wave.Tp)
+%                         hold on
+%                         h2=plot(burst_times,ocn.wave.Tpswell)
+%                         h3=plot(burst_times,ocn.wave.Tpsea)
+%                         set(gca,'xlim',xlims,'xtick',xt,'ytick',yt)
+%                         legend('Tp','swell','sea');
+%                         ylabel('Period (s)')
+%                         title([instrument ' ' location ],'interpreter','none')
+%                         datetick('x','mm/dd','keeplimits','keepticks')
+%                         %         xlabel(datestr(mean(burst_times),'YYYY'))
+%                         if exist('Offset_from_UTC','var')
+%                             xlabel([datestr(mean(burst_times),'YYYY') ' (UTC+' Offset_from_UTC ')'])
+%                         else
+%                             xlabel(datestr(mean(burst_times),'YYYY'))
+%                         end
+%                         rotateXLabels( gca(), 90 )
+%                         h1.Color=[0 0 0];
+%                         h2.Color=[ 0    0.4470    0.7410];
+%                         h3.Color=[0.8500    0.3250    0.0980];
+%
+%                         fname=[whereput '/' instrument '_' location '_WAVE_PERIOD_' datestr(xlims(1),'yyyymmdd') '-' datestr(xlims(2),'yyyymmdd')];
+%                         % print('-dpng','-r200', fname);
+%                         % print('-dpdf', '-painters', fname);
+%                         %         export_fig(fname,'-pdf','-png','-transparent')
+%                         savefig2_ylh(save_matfig,print_fig,use_export_fig,img_type,fname)
+%
+%
+%                     case 'no'
+%
+%                         %                     figure;
+%                         %                     hold on;
+%                         %                     plot(ocn.wave.Hm0);
+%                         %                     legend('Hm0');
+%                         %
+%                         %                     figure;
+%                         %                     hold on;
+%                         %                     plot(ocn.wave.Tp);
+%                         %                     legend('Tp');
+%                         %                     ylabel('Period (s)')
+%
+%                         f=figure;
+%                         f.Position=[66 207 1600 450];
+%                         f.Color='w';
+%                         plot(burst_times,ocn.wave.Hm0,'k')
+%                         legend('Hm0')
+%                         ylabel('Wave height (m)')
+%                         set(gca,'xlim',xlims,'xtick',xt)
+%                         set(gca,'ylim',[0 ceil(max(ocn.wave.Hm0))])
+%                         datetick('x','mm/dd','keeplimits','keepticks')
+%                         rotateXLabels( gca(), 90 )
+%                         xlabel(datestr(mean(burst_times),'YYYY'))
+%                         title([instrument ' ' location ],'interpreter','none')
+%                         fname=[whereput '/' instrument '_' location '_WAVE_HEIGHT_' datestr(xlims(1),'yyyymmdd') '-' datestr(xlims(2),'yyyymmdd')];
+%                         % print('-dpng','-r200', fname);
+%                         % print('-dpdf', '-painters', fname);
+%                         %         export_fig(fname,'-pdf','-png','-transparent')
+%                         savefig2_ylh(save_matfig,print_fig,use_export_fig,img_type,fname)
+%
+%                         f=figure;
+%                         f.Position=[200 100 1600 450];
+%                         f.Color='w';
+%                         h1=plot(burst_times,ocn.wave.Tp)
+%                         set(gca,'xlim',xlims,'xtick',xt,'ytick',yt)
+%                         legend('Tp','swell','sea');
+%                         ylabel('Period (s)')
+%                         title([instrument ' ' location ],'interpreter','none')
+%                         datetick('x','mm/dd','keeplimits','keepticks')
+%                         %         xlabel(datestr(mean(burst_times),'YYYY'))
+%                         if exist('Offset_from_UTC','var')
+%                             xlabel([datestr(mean(burst_times),'YYYY') ' (UTC+' Offset_from_UTC ')'])
+%                         else
+%                             xlabel(datestr(mean(burst_times),'YYYY'))
+%                         end
+%                         rotateXLabels( gca(), 90 )
+%                         h1.Color=[0 0 0];
+%                         %                 h2.Color=[ 0    0.4470    0.7410];
+%                         %                 h3.Color=[0.8500    0.3250    0.0980];
+%
+%                         fname=[whereput '/' instrument '_' location '_WAVE_PERIOD_' datestr(xlims(1),'yyyymmdd') '-' datestr(xlims(2),'yyyymmdd')];
+%                         % print('-dpng','-r200', fname);
+%                         % print('-dpdf', '-painters', fname);
+%                         %         export_fig(fname,'-pdf','-png','-transparent')
+%                         savefig2_ylh(save_matfig,print_fig,use_export_fig,img_type,fname)
+%
+%
+%                 end
+%
+%
+%             case 'zerocross'
+%                 %              Hs: [100×1 double]
+%                 %              Hz: [100×1 double]
+%                 %              Tz: [100×1 double]
+%                 %              Ts: [100×1 double]
+%                 % Hmax
+%
+%                 f=figure;
+%                 f.Position=[66 207 1600 450];
+%                 f.Color='w';
+%                 % set(gcf,'Position',[200 100 700 300])
+%                 % set(gcf,'PaperPositionMode','auto')
+%                 plot(burst_times,ocn.wave.Hs)
+%                 hold on
+%                 plot(burst_times,ocn.wave.Hz)
+%                 plot(burst_times,ocn.wave.Hmax)
+%                 legend('Hs','Hz','Hmax')
+%                 ylabel('Wave height (m)')
+%                 set(gca,'xlim',xlims,'xtick',xt)
+%                 set(gca,'ylim',[0 ceil(max(ocn.wave.Hmax))])
+%                 datetick('x','mm/dd','keeplimits','keepticks')
+%                 rotateXLabels( gca(), 90 )
+%                 xlabel(datestr(mean(burst_times),'YYYY'))
+%                 title([instrument ' ' location ],'interpreter','none')
+%                 fname=[whereput '/' instrument '_' location '_WAVE_HEIGHT_' datestr(xlims(1),'yyyymmdd') '-' datestr(xlims(2),'yyyymmdd')];
+%                 % print('-dpng','-r200', fname);
+%                 % print('-dpdf', '-painters', fname);
+%                 %         export_fig(fname,'-pdf','-png','-transparent')
+%                 savefig2_ylh(save_matfig,print_fig,use_export_fig,img_type,fname)
+%
+%                 f=figure;
+%                 f.Position=[200 500 1600 450];
+%                 f.Color='w';
+%                 plot(burst_times,ocn.wave.Ts)
+%                 hold on
+%                 plot(burst_times,ocn.wave.Tz)
+%                 set(gca,'xlim',xlims,'xtick',xt,'ytick',yt)
+%                 legend('Ts','Tz')
+%                 ylabel('Period (s)')
+%                 title([instrument ' ' location ],'interpreter','none')
+%                 datetick('x','mm/dd','keeplimits','keepticks')
+%                 %         xlabel(datestr(mean(burst_times),'YYYY'))
+%                 if exist('Offset_from_UTC','var')
+%                     xlabel([datestr(mean(burst_times),'YYYY') ' (UTC+' Offset_from_UTC ')'])
+%                 else
+%                     xlabel(datestr(mean(burst_times),'YYYY'))
+%                 end
+%                 rotateXLabels( gca(), 90 )
+%                 fname=[whereput '/' instrument '_' location '_WAVE_PERIOD_' datestr(xlims(1),'yyyymmdd') '-' datestr(xlims(2),'yyyymmdd')];
+%                 % print('-dpng','-r200', fname);
+%                 % print('-dpdf', '-painters', fname);
+%                 %         export_fig(fname,'-pdf','-png','-transparent')
+%                 savefig2_ylh(save_matfig,print_fig,use_export_fig,img_type,fname)
+%
+%         end
+%
+% end
+%
+
+
+
