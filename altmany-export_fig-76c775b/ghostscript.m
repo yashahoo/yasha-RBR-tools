@@ -115,7 +115,7 @@ function path_ = gs_path
             return
         end
     else
-        executable = {'/usr/bin/gs', '/usr/local/bin/gs'};
+        executable = {'/usr/bin/gs', '/usr/local/bin/gs','/opt/homebrew/Cellar/ghostscript'}; %yh 20230828 added homebrew path/
         for a = 1:numel(executable)
             path_ = executable{a};
             if check_store_gs_path(path_)
