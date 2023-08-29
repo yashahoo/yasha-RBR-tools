@@ -43,6 +43,7 @@
 
 % 20230414 yh
 % - saved as v9 for consistency with other working versions
+% - v9 and process_RBR_waves_sealevel are the same
 
 %%
 
@@ -101,15 +102,20 @@ addpath(genpath(pwd))
 % datum_correction= [1.74-1.2]  ; site_depth=1.5;  location='OldDunsborough'; rawfile='/Volumes/Margs_Clone/RBRpressure_sensors/20221027_Busselton_RBR_ABB_DUNS_EB_StuBarr/DUNS_D2_206857_20221027_1254.rsk' %done
 % datum_correction= [1.9-1.5] ;     site_depth=1.5;  location='EastBusselton'; rawfile='/Volumes/Margs_Clone/RBRpressure_sensors/20221027_Busselton_RBR_ABB_DUNS_EB_StuBarr/EastBusselton_D2_209847_20221027_1053.rsk' % done
 
-
+% Deployment 5 - StuBarr
+% datum_correction=[1.54-0.95] ; site_depth=1.5;  location='Abbey'; rawfile='/Volumes/Margs_Clone/RBRpressure_sensors/SN_124229_StuBarr_Abbey_Busselton_20210206-20210504/ABBEY_D5_124229_20230619_0854.rsk'
 
 % datum_correction= [NaN] ; site_depth=1.5;  location='Example'; rawfile='/Volumes/Margs_Clone/RBRpressure_sensors/20220818_Busselton_RBR_ABB_DUNS_EB_StuBarr/EASTBUSSO_209847_20220818_1102.rsk' % done
 
 % datum_correction= [NaN] ; site_depth=10;  location='Stirling'; rawfile='/Volumes/Margs_Clone/RBRpressure_sensors/SN_206854_20230403_chari_new/206854_20230403_1218.rsk' % done 6 depth
 
 
-% datum_correction= [NaN] ; site_depth=7;  location='SB1'; rawfile='/Volumes/YASHA16/124227_20230523_1312.rsk'
-datum_correction= [NaN] ; site_depth=7;  location='SB2'; rawfile='/Volumes/YASHA16/208790_20230523_1259.rsk'
+% % datum_correction= [NaN] ; site_depth=7;  location='SB1'; rawfile='/Volumes/YASHA16/124227_20230523_1312.rsk'
+% datum_correction= [NaN] ; site_depth=7;  location='SB2'; rawfile='/Volumes/YASHA16/208790_20230523_1259.rsk'
+
+
+datum_correction=[NaN] ; site_depth=2.8;  location='Gracetown_wavebuoy'; rawfile='/Volumes/Margs_Clone/Pressure_sensor_data/RBRpressure_sensors/SN124229_Gracetown_Wavebuoy_mooring_20230827/Gracetown_Wavebuoy_124229_20230828_1021.rsk'
+
 %%-------------------------------------------------------------------------%
 
 % EXAMPLE measurements required to change datum from MSL to Chart datum
@@ -143,7 +149,7 @@ datum_correction= [NaN] ; site_depth=7;  location='SB2'; rawfile='/Volumes/YASHA
 % % deployment info
 %%-------------------------------------------------------------------------%
 sample_rate_hz=2; % sampling in hz (normally 2)
-subsample_mins=10; % water level averaging interval in minutes (all other calculations done in hourly intervals)
+subsample_mins=1; % water level averaging interval in minutes (all other calculations done in hourly intervals)
 
 % provide absolute levels if you want to convert to Chart Datum:
 adjust_to_chart_datum = 'N'             %
@@ -162,7 +168,7 @@ plot_highpass_weeks= 'N'            % plot weekly highpass filter (was useful to
 save_matfile       = 'N'            % save the processed data to matfile
 save_matfig        = 'N';           % save the .fig files?
 print_fig          = 'Y';           % print to image file?
-use_export_fig     = 'N'            % if print_fig ='Y' -->  'N' uses native matlab print function (default) OR 'Y' uses export_fig to make nice plots
+use_export_fig     = 'Y'            % if print_fig ='Y' -->  'N' uses native matlab print function (default) OR 'Y' uses export_fig to make nice plots
 img_type           = {'pdf','png'}; % if print_fig ='Y' -->  {'pdf','png','eps'} % options. can be multiple. pdf will not save if native matlab unless edit function
 
 %%-------------------------------------------------------------------------%
@@ -171,7 +177,7 @@ img_type           = {'pdf','png'}; % if print_fig ='Y' -->  {'pdf','png','eps'}
 remove_dynamic_atm = 'N'            % Y if you have mslp observations to correct data... if N it will use subtracted 10.1325 db
 % load air pressure data [ and get mslp data for closest station)
 % must manualy define which station to use (e.g. 26 below is Busselton Airport)
- bom_index=18% % 26;
+ bom_index=26% % 26;
 % 1. Witchcliffe West
 % 2. Eucla
 % 3. Red Rocks Point
@@ -212,7 +218,7 @@ remove_dynamic_atm = 'N'            % Y if you have mslp observations to correct
 %%-------------------------------------------------------------------------%
 InputType='pressure' %'waterlevel' %'pressure'   %'waterlevel' %           % Data input ['pressure'] or  'waterlevel'. If pressure, the signal attenuation with depth will be applied [recommended].
 OutputType='wave+waterlevel' %'wave' %'wave+waterlevel'      % ['wave'], ['wave+waterlevel'];
-AnalysisMethod='spectral' %'spectral' %'zerocross' %'spectral' %'zerocross'  %'zerocross' %'spectral'         % Wave calculation method. 'zerocross' or ['spectral']. use zerocross if you want Hs, but very similar to Hm0 and swell/sea are useful
+AnalysisMethod=landcruiser co'zerocross' %'spectral' %'zerocross'  %'zerocross' %'spectral'         % Wave calculation method. 'zerocross' or ['spectral']. use zerocross if you want Hs, but very similar to Hm0 and swell/sea are useful
 burst_duration=3500;              % Interval of time window (in seconds) over which to calculate waves
 fs=sample_rate_hz;                % Frequency of data in Hz
 heightfrombed= 0 %site_depth-1 ;  % [Default=0]   % height of instrument above bed (m). Only required if ocn.InputType='pressure' and ocn.AnalysisMethod='spectral'.If unknown assume = 0
