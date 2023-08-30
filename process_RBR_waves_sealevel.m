@@ -116,7 +116,13 @@ addpath(genpath(pwd))
 % datum_correction= [NaN] ; site_depth=7;  location='SB2'; rawfile='/Volumes/YASHA16/208790_20230523_1259.rsk'
 
 
-datum_correction=[NaN] ; site_depth=2.8;  location='Gracetown_wavebuoy'; rawfile='/Volumes/Margs_Clone/Pressure_sensor_data/RBRpressure_sensors/SN124229_Gracetown_Wavebuoy_mooring_20230827/Gracetown_Wavebuoy_124229_20230828_1021.rsk'
+% datum_correction=[NaN] ; site_depth=2.8;  location='Gracetown_wavebuoy'; rawfile='/Volumes/Margs_Clone/Pressure_sensor_data/RBRpressure_sensors/SN124229_Gracetown_Wavebuoy_mooring_20230827/Gracetown_Wavebuoy_124229_20230828_1021.rsk'
+
+% datum_correction=[NaN] ; site_depth=1;  location='Abbey'; rawfile='/Volumes/YashaExt2/RBR03_Abbey_213073-290829/213074_20230829_1226.rsk'
+% datum_correction=[.4] ; site_depth=1;  location='Vasse'; rawfile='/Volumes/YashaExt2/RBR04_Vasse_Drain_213074/213073_20230829_1347.rsk'
+
+
+datum_correction=[NaN] ; site_depth=8;  location='CB'; rawfile='/Volumes/YashaExt2/RBR03_Abbey_213073-290829/213074_20230829_1226.rsk'
 
 %%-------------------------------------------------------------------------%
 
@@ -220,7 +226,7 @@ remove_dynamic_atm = 'N'            % Y if you have mslp observations to correct
 %%-------------------------------------------------------------------------%
 InputType='pressure' %'waterlevel' %'pressure'   %'waterlevel' %           % Data input ['pressure'] or  'waterlevel'. If pressure, the signal attenuation with depth will be applied [recommended].
 OutputType='wave+waterlevel' %'wave' %'wave+waterlevel'      % ['wave'], ['wave+waterlevel'];
-AnalysisMethod=landcruiser co'zerocross' %'spectral' %'zerocross'  %'zerocross' %'spectral'         % Wave calculation method. 'zerocross' or ['spectral']. use zerocross if you want Hs, but very similar to Hm0 and swell/sea are useful
+AnalysisMethod='spectral' %'zerocross'  %'zerocross' %'spectral'         % Wave calculation method. 'zerocross' or ['spectral']. use zerocross if you want Hs, but very similar to Hm0 and swell/sea are useful
 burst_duration=3500;              % Interval of time window (in seconds) over which to calculate waves
 fs=sample_rate_hz;                % Frequency of data in Hz
 heightfrombed= 0 %site_depth-1 ;  % [Default=0]   % height of instrument above bed (m). Only required if ocn.InputType='pressure' and ocn.AnalysisMethod='spectral'.If unknown assume = 0
