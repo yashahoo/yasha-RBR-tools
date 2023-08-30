@@ -16,6 +16,7 @@ function [Hm0,Hm0sea,Hm0swell,Tp,Tpsea,Tpswell,fp,fseparation,f,Syy]=SeaSwellFun
 %   -added  fix for when fseparation failed due to small unrealistic waves.
     Forced split between swell/sea to be 8 secs. option to fill with nans if
     modify line 214 to be separate_failed='Y';
+
 SeaSwellFun
 ===========
 
