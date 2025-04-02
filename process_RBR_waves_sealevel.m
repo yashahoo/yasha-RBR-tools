@@ -78,6 +78,7 @@ restoredefaultpath % this just fixes if there are any conflicting functions
 
 % this should work if you run it from the yasha_RBR_tools directory
 addpath(genpath(pwd))
+% addpath(genpath('/opt/homebrew/Cellar/ghostscript/10.03.1/bin')) % for yh macbook computer
 % addpath(genpath('rbr-rsktools'))
 %%-------------------------------------------------------------------------%
 %% -------------------------settings-------------------------------------- %
@@ -133,7 +134,8 @@ addpath(genpath(pwd))
 
 % datum_correction=[-.37] ; site_depth=3;  location='PelicanPoint'; rawfile='/Volumes/Margs_Clone5/Pressure_sensor_data/RBRpressure_sensors/SN14229_StuBarr_Bunbury_PelicanPoint/124229_20240201_0922.rsk'
 
-datum_correction=[NaN] ; site_depth=1;  location='HamelinPool_SouthernPile'; rawfile='/Users/00068592/Documents/RESEARCH/DATA/MEASURED/RBRpressure_sensors/SN124228_Hamelin_pool_southern_pile_20250323/124228_20250323_1514_Boardwalk_Southern_Pile.rsk'
+% datum_correction=[NaN] ; site_depth=1;  location='HamelinPool_SouthernPile'; rawfile='/Volumes/Margs_Clone5/Pressure_sensor_data/RBRpressure_sensors/HamelinPool/SN124228_Hamelin_pool_southern_pile_20250323/124228_20250323_1514_Boardwalk_Southern_Pile.rsk'
+datum_correction=[NaN] ; site_depth=1;  location='HamelinPool_NorthernPile'; rawfile='/Volumes/Margs_Clone5/Pressure_sensor_data/RBRpressure_sensors/HamelinPool/SN206853_Hamelin_pool_northern_pile_20250323/206853_20250323_1533_Boardwalk_Northern_Pile.rsk'
 %%-------------------------------------------------------------------------%
 
 % EXAMPLE measurements required to change datum from MSL to Chart datum
@@ -205,7 +207,7 @@ remove_dynamic_atm = 'N'            % Y if you have mslp observations to correct
 %%-------------------------------------------------------------------------%
 InputType='pressure' %'waterlevel' %'pressure'   %'waterlevel' %           % Data input ['pressure'] or  'waterlevel'. If pressure, the signal attenuation with depth will be applied [recommended].
 OutputType='wave+waterlevel' %'wave' %'wave+waterlevel'      % ['wave'], ['wave+waterlevel'];
-AnalysisMethod='zerocross' %'spectral' %'zerocross'  %'zerocross' %'spectral'         % Wave calculation method. 'zerocross' or ['spectral']. use zerocross if you want Hs, but very similar to Hm0 and swell/sea are useful
+AnalysisMethod='spectral' %'spectral' %'zerocross' %'spectral' %'zerocross'  %'zerocross' %'spectral'         % Wave calculation method. 'zerocross' or ['spectral']. use zerocross if you want Hs, but very similar to Hm0 and swell/sea are useful
 burst_duration=3500;              % Interval of time window (in seconds) over which to calculate waves
 fs=sample_rate_hz;                % Frequency of data in Hz
 heightfrombed= 2 %site_depth-1 ;  % [Default=0]   % height of instrument above bed (m). Only required if ocn.InputType='pressure' and ocn.AnalysisMethod='spectral'.If unknown assume = 0
