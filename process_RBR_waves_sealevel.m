@@ -47,6 +47,11 @@
 % 20230829 yh
 % - tested on new rbr data. successful.
 
+% 20230911 yh
+% - added option to save only sub hourly sealevel to text (for toby inlet
+% strange case). Manual intervention needed to run parts of script worth
+% doing.
+
 %%
 
 
@@ -122,8 +127,13 @@ addpath(genpath(pwd))
 % datum_correction=[.4] ; site_depth=1;  location='Vasse'; rawfile='/Volumes/YashaExt2/RBR04_Vasse_Drain_213074/213073_20230829_1347.rsk'
 
 
-datum_correction=[NaN] ; site_depth=8;  location='CB'; rawfile='/Volumes/YashaExt2/RBR03_Abbey_213073-290829/213074_20230829_1226.rsk'
+% datum_correction=[NaN] ; site_depth=8;  location='CB'; rawfile='/Volumes/YashaExt2/RBR03_Abbey_213073-290829/213074_20230829_1226.rsk'
 
+% datum_correction=[NaN] ; site_depth=1;  location='Toby'; rawfile='/Volumes/Margs_Clone/Pressure_sensor_data/RBRpressure_sensors/202308_StuBarr_Geographe_Bay/RBR02_Toby_Inlet_206860-20230829/206860_20230829_1133.rsk' % this locations was cut off from ocean at start and end of file.
+
+% datum_correction=[-.37] ; site_depth=3;  location='PelicanPoint'; rawfile='/Volumes/Margs_Clone5/Pressure_sensor_data/RBRpressure_sensors/SN14229_StuBarr_Bunbury_PelicanPoint/124229_20240201_0922.rsk'
+
+datum_correction=[NaN] ; site_depth=1;  location='HamelinPool_SouthernPile'; rawfile='/Users/00068592/Documents/RESEARCH/DATA/MEASURED/RBRpressure_sensors/SN124228_Hamelin_pool_southern_pile_20250323/124228_20250323_1514_Boardwalk_Southern_Pile.rsk'
 %%-------------------------------------------------------------------------%
 
 % EXAMPLE measurements required to change datum from MSL to Chart datum
@@ -171,8 +181,9 @@ round_start_finish = 'N'            % if you want nice start and end times (e.g.
 calculate_waves    = 'Y'            % calculate wave parameters including Hs, Tz, etc.   
 calculate_IG       = 'Y'            % calculate Infragravity waves (shoudl be 'Y' if calculating waves)
 get_time_freq      = 'Y'            % use chari's function to calculate time-frequency plot
-do_highpass_filter = 'N'            % do highpass filter to remove waves > max_period
-plot_highpass_weeks= 'N'            % plot weekly highpass filter (was useful to look at boatwakes in albany)
+save_subhr_sealevel_only_txt = 'N'  % for cases where cannot get tide and residual, save only sub-hourly sealevel data to csv text file
+do_highpass_filter = 'Y'            % do highpass filter to remove waves > max_period
+plot_highpass_weeks= 'Y'            % plot weekly highpass filter (was useful to look at boatwakes in albany)
 save_matfile       = 'N'            % save the processed data to matfile
 save_matfig        = 'N';           % save the .fig files?
 print_fig          = 'Y';           % print to image file?
@@ -185,39 +196,7 @@ img_type           = {'pdf','png'}; % if print_fig ='Y' -->  {'pdf','png','eps'}
 remove_dynamic_atm = 'N'            % Y if you have mslp observations to correct data... if N it will use subtracted 10.1325 db
 % load air pressure data [ and get mslp data for closest station)
 % must manualy define which station to use (e.g. 26 below is Busselton Airport)
- bom_index=26% % 26;
-% 1. Witchcliffe West
-% 2. Eucla
-% 3. Red Rocks Point
-% 4. Rowley Shoals
-% 5. Adele Island
-% 6. Browse Island
-% 7. Broome
-% 8. Port Hedland
-% 9. Karratha
-% 10. Bedout Island
-% 11. Learmonth
-% 12. Onslow Airport
-% 13. Barrow Island
-% 14. Carnarvon
-% 15. Shark Bay Airport
-% 16. North Island
-% 17. Geraldton Airport
-% 18. Perth Airport
-% 19. Rottnest Island
-% 20. Ocean Reef
-% 21. Swanbourne
-% 22. Garden Island
-% 23. Hillarys Point Boat Harbour
-% 24. Cape Leeuwin
-% 25. Cape Naturaliste
-% 26. Busselton Airport
-% 27. Esperance
-% 28. Hopetoun North
-% 29. Bunbury
-% 30. Mandurah
-% 31. Walpole North
-% 32. Albany Airport
+ bom_index=27% % 26;
 
 %%-------------------------------------------------------------------------%
 %      Wave calculation settings [for oceanlyz toolbox]
@@ -226,13 +205,13 @@ remove_dynamic_atm = 'N'            % Y if you have mslp observations to correct
 %%-------------------------------------------------------------------------%
 InputType='pressure' %'waterlevel' %'pressure'   %'waterlevel' %           % Data input ['pressure'] or  'waterlevel'. If pressure, the signal attenuation with depth will be applied [recommended].
 OutputType='wave+waterlevel' %'wave' %'wave+waterlevel'      % ['wave'], ['wave+waterlevel'];
-AnalysisMethod='spectral' %'zerocross'  %'zerocross' %'spectral'         % Wave calculation method. 'zerocross' or ['spectral']. use zerocross if you want Hs, but very similar to Hm0 and swell/sea are useful
+AnalysisMethod='zerocross' %'spectral' %'zerocross'  %'zerocross' %'spectral'         % Wave calculation method. 'zerocross' or ['spectral']. use zerocross if you want Hs, but very similar to Hm0 and swell/sea are useful
 burst_duration=3500;              % Interval of time window (in seconds) over which to calculate waves
 fs=sample_rate_hz;                % Frequency of data in Hz
-heightfrombed= 0 %site_depth-1 ;  % [Default=0]   % height of instrument above bed (m). Only required if ocn.InputType='pressure' and ocn.AnalysisMethod='spectral'.If unknown assume = 0
+heightfrombed= 2 %site_depth-1 ;  % [Default=0]   % height of instrument above bed (m). Only required if ocn.InputType='pressure' and ocn.AnalysisMethod='spectral'.If unknown assume = 0
 dispout='no';                     % Display output of calculations at each burst ('yes or 'no')
 Rho=1024;                         % Seawater density (Varies)
-SeparateSeaSwell='yes'            % 'yes or 'no' (only works with spectral)
+SeparateSeaSwell='no'            % 'yes or 'no' (only works with spectral)
 fmaxswell=1/8 %0.25;              % Maximum swell frequency (spectral only). 1/Period (ie. minimum period a swell can have). It should be between 0 and (fs/2). Only required if SeparateSeaSwell='yes' and AnalysisMethod='spectral'
 fpminswell=1/25 %0.1;             % Minimum swell frequency (spectral only)
 max_period= 25;                   % max period to use in wave calculations and filtering
@@ -245,6 +224,8 @@ max_period= 25;                   % max period to use in wave calculations and f
 % finish=datenum(2022,9,21,12,17,22);
 % begin=datenum(2022,7,1,10,54,34);
 % finish=datenum(2022,8,16,9,11,31);
+% begin=datenum('19-Dec-2023 11:56:46');
+% finish=datenum('01-Feb-2024 08:49:07');
 begin=NaN;
 finish=NaN;
 
@@ -357,6 +338,11 @@ try
     Offset_from_UTC=ncreadatt([ncref],'time','Offset_from_UTC')
 catch
     disp('Offset_from_UTC not available')
+    
+%     set offset manually through dialogue box if variable does not exist
+    
+    
+    
 end
 
 try
@@ -853,6 +839,7 @@ switch calculate_waves
                 xlabel(datestr(mean(burst_times),'YYYY'))
                 title([instrument ' ' location ],'interpreter','none')
                 fname=[whereput '/' instrument '_' location '_WAVE_HEIGHT_' datestr(xlims(1),'yyyymmdd') '-' datestr(xlims(2),'yyyymmdd')];
+                fname=[whereput '/124229_PelicanPoint_SEALEVEL_ChartDatum_1mins_20231219-20240201-WITH_INNERHARBOUR'];
                 % print('-dpng','-r200', fname);
                 % print('-dpdf', '-painters', fname);
                 %         export_fig(fname,'-pdf','-png','-transparent')
@@ -1164,8 +1151,10 @@ switch datum
         box on;
         grid on;
         title([instrument ' ' location ' Averaging interval = ' num2str(subsample_mins) ' minutes'],'interpreter','none');
-        
+%         title([instrument ' ' location ' 2Hz'],'interpreter','none');
         fname=[whereput '/' instrument '_' location '_SEALEVEL_ChartDatum_' num2str(subsample_mins) 'mins_' datestr(xlims(1),'yyyymmdd') '-' datestr(xlims(2),'yyyymmdd')];
+%         fname=[whereput '/' instrument '_' location '_SEALEVEL_ChartDatum_2Hz_' datestr(xlims(1),'yyyymmdd') '-' datestr(xlims(2),'yyyymmdd')];
+%         fname=[whereput '/' instrument '_' location '_SEALEVEL_ChartDatum_2Hz_' datestr(ax.XLim(1),'yyyymmddHH') '-' datestr(ax.XLim(2),'yyyymmddHH')];
         savefig2_ylh(save_matfig,print_fig,use_export_fig,img_type,fname)
         
     case 'MSL'
@@ -1661,8 +1650,34 @@ writetable(T,outf_tname,'Delimiter',',','QuoteStrings',true)
 
 disp('sub-Hourly sea level only data saved to csv text file')
 
-
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% save only 1 min sealevel to csv (for weird files)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+switch save_subhr_sealevel_only_txt
+    case 'Y'
+        sub_time=reshape(time_subsampled,[],1);
+        sub_press=reshape(press_subsampled,[],1);
+        
+        if exist('temperature_subsampled','var')
+            %     sub_temp=temperature_subsampled;
+            sub_temp=reshape(temperature_subsampled,[],1);
+        end
+        % varnames={'Time WST','Hrms',
+        
+        % table
+        timestr=datestr(sub_time,'yyyy-mm-dd HH:MM:SS');
+        Time_WST=cellstr(timestr);
+        if exist('sub_temp','var')
+            T = table(timestr,sub_press,sub_temp);
+        else
+            T = table(timestr,sub_press);
+        end
+        
+        outf_tname=[whereput '/' instrument '_' location '_' datestr(xlims(1),'yyyymmdd') '-' datestr(xlims(2),'yyyymmdd') '_Sealevel_ONLY_' num2str(subsample_mins) '_minutes.csv'];
+        writetable(T,outf_tname,'Delimiter',',','QuoteStrings',true)
+        
+        disp('sub-Hourly sea level only data saved to csv text file')
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% do the spectral analysis
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1940,6 +1955,7 @@ switch do_highpass_filter
                     % pause
                     
                     fname=[whereput '/' instrument '_' location '_HIGHPASS_weekly_' datestr(ts(inds(1)) ,'yyyymmdd') '-' datestr(ts(inds(end)),'yyyymmdd')];
+%                     fname=[whereput '/' instrument '_' location '_HIGHPASS-tight'];
                     % export_fig(fname,'-pdf','-png','-transparent')
                     % print('-dpng','-r200', fname);
                     % print('-dpdf', '-painters', fname);
@@ -1962,6 +1978,7 @@ switch do_highpass_filter
         % set(gca,'xticklabel',[]);
         % datetick('x','yyyy/mm/dd ','keeplimits')
         plot(wt(tf),wz(tf)-1,'r.')
+%         plot(wt(tf),wz(tf)*0-.1,'r.')
         set(gca,'xlim',xlims,'xtick',xt)
         set(gca,'ylim',[floor(min(data)) ceil(max(data))],'ytick',[-1:.25:2])
         datetick('x','mm/dd','keeplimits','keepticks')
@@ -1973,6 +1990,8 @@ switch do_highpass_filter
         grid on
         
         fname=[whereput '/' instrument '_' location '_HIGHPASS_' datestr(ts(inds(1)) ,'yyyymmdd') '-' datestr(ts(inds(end)),'yyyymmdd')];
+%          fname=[whereput '/' instrument '_' location '_HIGHPASS_' datestr(tsub(1) ,'yyyymmdd') '-' datestr(tsub(end),'yyyymmdd')];
+         
         % print('-dpng','-r200', fname);
         % print('-dpdf', '-painters', fname);
         %         export_fig(fname,'-pdf','-png','-transparent')

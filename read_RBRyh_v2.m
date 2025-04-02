@@ -97,10 +97,20 @@ RSKplotdownsample(data1)
 disp('Reading complete rsk file...SLOW')
 data1=RSKreaddata(data1); % read all data
 
+% old instruments only
+% if strcmpi('OFFSET_FROM_UTC',data1.parameterKeys(16).key)
+%     OFFSET_FROM_UTC=data1.parameterKeys(16).value
+% end
 
-if strcmpi('OFFSET_FROM_UTC',data1.parameterKeys(16).key)
-    OFFSET_FROM_UTC=data1.parameterKeys(16).value
-end
+% yh 20250402
+%find where the 'OFFSET_FROM_UTC' variable is (this changes fornewinstruments) yh 20250402
+% % % % for ki=1:length(data1.parameterKeys)
+% % % %     keytxt{ki}=data1.parameterKeys(ki).key;
+% % % % end
+% % % % kid=strcmpi('OFFSET_FROM_UTC',keytxt);
+
+kid=find(strcmpi({data1.parameterKeys.key},'OFFSET_FROM_UTC'))
+OFFSET_FROM_UTC=data1.parameterKeys(kid).value;
 
 % yh 20230412
 % find which channel is temperature and find which is pressure (rsktools-3.5.3)
