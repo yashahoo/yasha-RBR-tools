@@ -6,7 +6,7 @@ Derived from Yasha-RBR_tools_v9 (latest working version)
 Toolbox to read rbr pressure sensor data and calculate waves and sealevel variables
 Uses ocn toolbox to get waves which allows for pressure attenuation correction.
 
-** process_RBR_waves_sealevel_v9.m -- this is the main script used to do all the processing. Must carefully edit all the settings in this m-file
+** process_RBR_waves_sealevel.m -- this is the main script used to do all the processing. Must carefully edit all the settings in this m-file
  
 % This m-file reads raw .rsk file downloaded from RBR pressure sensors
 % using rsk-tools (downloadad from rbr website)
