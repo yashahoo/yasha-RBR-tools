@@ -132,36 +132,55 @@ addpath(genpath(pwd))
 % rawfile9='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2020_Parmelia_CLEANED_v1/202101_Parmelia_Cleaned_pressure_data.mat';
 % rawfile10='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2020_Parmelia_CLEANED_v1/202102_Parmelia_Cleaned_pressure_data.mat';
 
-rawfile1='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202110_Cleaned_pressure_data.mat';
-rawfile2='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202111_Cleaned_pressure_data.mat';
-rawfile3='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202112_Cleaned_pressure_data.mat';
-rawfile4='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202201_Cleaned_pressure_data.mat';
-rawfile5='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202202_Cleaned_pressure_data.mat';
-rawfile6='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202203_Cleaned_pressure_data.mat';
-rawfile7='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202204_Cleaned_pressure_data.mat';
-rawfile8='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202205_Cleaned_pressure_data.mat';
-rawfile9='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202206_Cleaned_pressure_data.mat';
-rawfile10='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202207_Cleaned_pressure_data.mat';
-rawfile11='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202208_Cleaned_pressure_data.mat';
-rawfile12='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202209_Cleaned_pressure_data.mat';
-rawfile13='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202210_Cleaned_pressure_data.mat';
-rawfile14='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202211_Cleaned_pressure_data.mat';
-rawfile15='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202212_Cleaned_pressure_data.mat';
-rawfile16='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202301_Cleaned_pressure_data.mat';
-rawfile17='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202302_Cleaned_pressure_data.mat';
-rawfile18='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202303_Cleaned_pressure_data.mat';
-rawfile19='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202304_Cleaned_pressure_data.mat';
-rawfile20='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202305_Cleaned_pressure_data.mat';
+% Good timestamps success
+% rawfile1='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202110_Cleaned_pressure_data.mat';
+% rawfile2='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202111_Cleaned_pressure_data.mat';
+% rawfile3='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202112_Cleaned_pressure_data.mat';
+% rawfile4='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202201_Cleaned_pressure_data.mat';
+% rawfile5='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202202_Cleaned_pressure_data.mat';
+% rawfile6='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202203_Cleaned_pressure_data.mat';
+% rawfile7='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202204_Cleaned_pressure_data.mat';
+% rawfile8='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202205_Cleaned_pressure_data.mat';
+% rawfile9='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202206_Cleaned_pressure_data.mat';
+% rawfile10='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202207_Cleaned_pressure_data.mat';
+% rawfile11='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202208_Cleaned_pressure_data.mat';
+% rawfile12='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202209_Cleaned_pressure_data.mat';
+% rawfile13='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202210_Cleaned_pressure_data.mat';
+% rawfile14='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202211_Cleaned_pressure_data.mat';
+% rawfile15='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202212_Cleaned_pressure_data.mat';
+% rawfile16='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202301_Cleaned_pressure_data.mat';
+% rawfile17='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202302_Cleaned_pressure_data.mat';
+% rawfile18='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202303_Cleaned_pressure_data.mat';
+% rawfile19='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202304_Cleaned_pressure_data.mat';
+% rawfile20='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1/202305_Cleaned_pressure_data.mat';
+% % /Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1
+
+% STirling recent - bad timestamps
+rawfile1='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2022-2023_Stirling_Connect_CLEANED_v1/202201_Cleaned_pressure_data.mat';
+rawfile2='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2022-2023_Stirling_Connect_CLEANED_v1/202202_Cleaned_pressure_data.mat';
+rawfile3='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2022-2023_Stirling_Connect_CLEANED_v1/202203_Cleaned_pressure_data.mat';
+rawfile4='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2022-2023_Stirling_Connect_CLEANED_v1/202204_Cleaned_pressure_data.mat';
+rawfile5='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2022-2023_Stirling_Connect_CLEANED_v1/202205_Cleaned_pressure_data.mat';
+rawfile6='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2022-2023_Stirling_Connect_CLEANED_v1/202206_Cleaned_pressure_data.mat';
+rawfile7='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2022-2023_Stirling_Connect_CLEANED_v1/202207_Cleaned_pressure_data.mat';
+rawfile8='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2022-2023_Stirling_Connect_CLEANED_v1/202208_Cleaned_pressure_data.mat';
+rawfile9='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2022-2023_Stirling_Connect_CLEANED_v1/202209_Cleaned_pressure_data.mat';
+rawfile10='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2022-2023_Stirling_Connect_CLEANED_v1/202210_Cleaned_pressure_data.mat';
+rawfile11='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2022-2023_Stirling_Connect_CLEANED_v1/202211_Cleaned_pressure_data.mat';
+rawfile12='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2022-2023_Stirling_Connect_CLEANED_v1/202212_Cleaned_pressure_data.mat';
+rawfile13='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2022-2023_Stirling_Connect_CLEANED_v1/202301_Cleaned_pressure_data.mat';
+rawfile14='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2022-2023_Stirling_Connect_CLEANED_v1/202302_Cleaned_pressure_data.mat';
+rawfile15='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2022-2023_Stirling_Connect_CLEANED_v1/202303_Cleaned_pressure_data.mat';
 
 
-% /Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1
+
 
 
 % rawfiles={rawfile2 ;rawfile3; rawfile4 ;rawfile5 ;rawfile6 ;rawfile7 ;rawfile8;rawfile9 ;rawfile10 ;rawfile11 ;rawfile12} %rawfile1; 
 % rawfiles={rawfile1;rawfile2;rawfile3};
 % rawfiles={rawfile1;rawfile2;rawfile3;rawfile4 ;rawfile5 ;rawfile6 ;rawfile7 ;rawfile8;rawfile9 ;rawfile10;rawfile11;rawfile12;rawfile13;rawfile14 ;rawfile15 ;rawfile16 ;rawfile17 ;rawfile18;rawfile19 ;rawfile20} 
 % rawfiles={rawfile9} 
-rawfiles={rawfile1;rawfile2;rawfile3;rawfile4 ;rawfile5 ;rawfile6 ;rawfile7 ;rawfile8;rawfile9 ;rawfile10;rawfile11;rawfile12;rawfile13;rawfile14 ;rawfile15 ;rawfile16 ;rawfile17 ;rawfile19 ;rawfile20} %rawfile18; march is bad for some reason
+rawfiles={rawfile1;rawfile2;rawfile3;rawfile4 ;rawfile5 ;rawfile6 ;rawfile7 ;rawfile8;rawfile9 ;rawfile10;rawfile11;rawfile12;rawfile13;rawfile14 ;rawfile15 } %rawfile18; march is bad for some reason
 for rfi=1:length(rawfiles)
 %     try
     close all
@@ -171,7 +190,7 @@ for rfi=1:length(rawfiles)
     %%-------------------------------------------------------------------------%
     % % deployment info
     %%-------------------------------------------------------------------------%
-    location='Success';
+    location='Stirling';
     datum_correction= [NaN] ;
     input_Offset_from_UTC = 0 ; %Input timezone offset in hrs from UTC
     output_Offset_from_UTC = 8; % this is output timezone in hrs frm UTC
@@ -197,7 +216,7 @@ for rfi=1:length(rawfiles)
     max_timegap_days   = 10 %10/3600/24;    % maximum time gap (in das) to interpolate data across when create_gapfree_time= 'Y'; 10/3600/24 = 10 seconds
     calculate_waves    = 'Y'            % calculate wave parameters including Hs, Tz, etc.
     calculate_IG       = 'Y'            % calculate Infragravity waves (shoudl be 'Y' if calculating waves)
-    get_time_freq      = 'Y'            % use chari's function to calculate time-frequency plot
+    get_time_freq      = 'N'            % use chari's function to calculate time-frequency plot
     do_highpass_filter = 'N'            % do highpass filter to remove waves > max_period
     plot_highpass_weeks= 'N'            % plot weekly highpass filter (was useful to look at boatwakes in albany)
     save_matfile       = 'Y'            % save the processed data to matfile
@@ -217,7 +236,7 @@ for rfi=1:length(rawfiles)
     
     InputType='pressure'   %'waterlevel' %           % Data input ['pressure'] or  'waterlevel'. If pressure, the signal attenuation with depth will be applied [recommended].
     OutputType='wave+waterlevel' %'wave' %'wave+waterlevel'      % ['wave'], ['wave+waterlevel']; **  If using waterlevel and not correcting for pressure. must do 'wave' only as output **
-    AnalysisMethod='zerocross' %'spectral' %'spectral' %'zerocross' %'spectral' %'zerocross' %'spectral' %'zerocross' %'spectral' %'spectral' %'zerocross' %'spectral' %'zerocross'  %'zerocross' %'spectral'         % Wave calculation method. 'zerocross' or ['spectral']. use zerocross if you want Hs, but very similar to Hm0 and swell/sea are useful
+    AnalysisMethod='zerocross' %'spectral' %'zerocross' %'spectral' %'spectral' %'zerocross' %'spectral' %'zerocross' %'spectral' %'zerocross' %'spectral' %'spectral' %'zerocross' %'spectral' %'zerocross'  %'zerocross' %'spectral'         % Wave calculation method. 'zerocross' or ['spectral']. use zerocross if you want Hs, but very similar to Hm0 and swell/sea are useful
     
     burst_duration=3600;              % Interval of time window (in seconds) over which to calculate waves
     fs=sample_rate_hz;                % Frequency of data in Hz
@@ -1785,6 +1804,8 @@ Offset_from_UTC = num2str(output_Offset_from_UTC); % this is output timezone str
     %subplot(221)
     loglog(f,Sxx,'k-','linewidth',1.5)
     hold on
+    loglog(a.f,a.Sxx,'k-','linewidth',1.5)
+    loglog(b.f,b.Sxx,'k-','linewidth',1.5)
     %axis([1e-7 1e-2 1e0 1e4])
     ylabel('Spectral Density (m^2/Hz)')
     xlabel('Frequency (Hz)')
@@ -1794,6 +1815,7 @@ Offset_from_UTC = num2str(output_Offset_from_UTC); % this is output timezone str
     ylim=get(gca,'ylim');
     ymiddle=1e-4;
     ytop=1e3;
+    legend('Stirling Aug 2022','Success Aug 2022')
     
     % to add a vertical line at a period of 24 hours (f24)
     
