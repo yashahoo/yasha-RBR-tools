@@ -77,7 +77,7 @@ legend('Success','FM tide gauge','5 min success','Hm0sea','Hm0swell','n-componen
 title('Success CombinedDataFeed')
 box on
 
-%% do for 2022
+%% do for june 2022
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %tide gauge prediction
 Tpred=[datenum(2022,6,1):datenum(0,0,0,0,5,0):datenum(2022,7,1)];
@@ -136,4 +136,4 @@ legend('Success','FM tide gauge','5 min success','Hm0sea','Hm0swell','n-componen
 title('Success CombinedDataFeed')
 box on
 
-
+%% do for all
