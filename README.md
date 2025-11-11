@@ -22,10 +22,10 @@ Uses ocn toolbox to get waves which allows for pressure attenuation correction.
 %  http://zarmesh.com/wp-content/uploads/2016/05/Wind-wave-analysis-in-depth-limited-water-using-OCEANLYZ-A-MATLAB-toolbox.pdf
 %  https://oceanlyz.readthedocs.io/en/latest/
 % 
-## contents
-process_RBR_waves_sealevel_v9.m  - main driver for complete wave analysis and averaging of water level, filtering,tidal analysis, save outputs to hourly text files
+## Contents
+process_RBR_waves_sealevel.m - main driver for complete wave analysis and averaging of water level, filtering,tidal analysis, save outputs to hourly text files
 
-%% process waves using chari's scripts made into a function 
+%% process waves using chari's scripts made into a function
 get_chari_wave_analysis.m
 autospec.m
 opclevel.m
@@ -33,12 +33,11 @@ oppsd.m
 oppsd2.m
 opsmooth.m
 periodo.m
-get_tidespecft.m  - function to produce time-frequency plots from sea level data
+get_tidespecft.m - function to produce time-frequency plots from sea level data
 wavenumber.m
 wavepar.m
 wavepar2_yh.m
 wavepar_yh.m
-
 
 interp1gap.m
 interp_r.m
@@ -48,35 +47,33 @@ highpass.m
 nanmean.m
 newdatestr.m
 fillgapYLH.m
-get_beginfinish.m 		-interactively select start and finish times
-get_finish.m			-interactively select only finish time (start at beginning)
+get_beginfinish.m -interactively select start and finish times
+get_finish.m -interactively select only finish time (start at beginning)
 get_outliers_yh.m
 date2doy.m
 rotateXLabels.m
 savefig2_ylh.m
 
-read_RBRyh.m    - old version  for reading rsk files. outdated,  but works on older instruments. replaced by v2
+read_RBRyh.m - old version for reading rsk files. outdated, but works on older instruments. replaced by v2
 read_RBRyh_v2.m - read raw rsk file and save to netcdf
 
-
-importDOTfile.m					- read departlent of transport 5min tide gauge file
-process_DOT_5min_waterlevel.m   - process DOT tide gauge file
-detrend_notes_yasha.m			- how to detrend sea level, etc.
-
+importDOTfile.m - read department of transport 5min tide gauge file
+process_DOT_5min_waterlevel.m - process DOT tide gauge file
+detrend_notes_yasha.m - how to detrend sea level, etc.
 
 ##								    Toolboxes used
-t_tide_v1/ - tidal analysis
-subaxis/  - better multi axis plots
-rbr-rsktools-3.5.3/ -  tools to read rsk data from rbr sensors
-plot_bom_wind_arrows_yh/ - plot seabreeze style wind arrows
-oceanlyz_2_0/  - main toolbox for calculating waves
-altmany-export_fig-76c775b/ - optional way to save figures  and retain how it looks on screen. requires ghostscript to be installed
+t_tide_v1/ - tidal analysis  
+subaxis/  - better multi axis plots  
+rbr-rsktools-3.5.3/ -  tools to read rsk data from rbr sensors  
+plot_bom_wind_arrows_yh/ - plot seabreeze style wind arrows  
+oceanlyz_2_0/  - main toolbox for calculating waves  
+altmany-export_fig-76c775b/ - optional way to save figures  and retain how it looks on screen. requires ghostscript to be installed  
 
 
 ----NOT used ----
-junk/
-outdated_mfiles/
-extra_outdated_mfiles/
+junk/  
+outdated_mfiles/  
+extra_outdated_mfiles/  
 
 
 
@@ -97,7 +94,7 @@ import_daily_pressure_NorthMole.m
 import_pressure_logfiles.m 
 
 ------------------------------------------------------------------------------------------
-					random minor use functions - not sure if needed
+					Random minor use functions - not sure if needed
 ------------------------------------------------------------------------------------------
-doc_datacursormode.m
-myupdatefcn.m
+doc_datacursormode.m  
+myupdatefcn.m  
