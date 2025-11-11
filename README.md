@@ -82,17 +82,19 @@ extra_outdated_mfiles/
 
 ##								    Fremantle Port - Stirling pressure sensor data analysis
 
-subset_clean_Stirling_annual_to_monthly_matfiles.m
-process_Stirling_waves_sealevel_v9.m
-driver_get_stirling_waves_v9_daily_loop.m
-driver_get_stirling_waves_v9_hourly_loop.m
-driver_read_save_stirling_pressure_v9_daily.m
-driver_read_save_stirling_pressure_v9_hourly.m
-cat_Stirling_Outputs_months2year.m
-importStirling2020.m
-import_daily_BAD_pressure.m
-import_daily_pressure.m
-import_pressure_logfiles.m
+subset_clean_Stirling_annual_to_monthly_matfiles.m  
+process_Stirling_waves_sealevel.m  
+driver_get_stirling_waves_daily_loop.m  
+driver_get_stirling_waves_hourly_loop.m  
+driver_read_save_stirling_pressure_daily.m  
+driver_read_save_stirling_pressure_hourly.m  
+cat_Stirling_Outputs_months2year.m  
+importStirling2020.m  
+import_daily_BAD_pressure.m  
+import_daily_pressure.m  
+import_daily_pressure_success.m  
+import_daily_pressure_NorthMole.m  
+import_pressure_logfiles.m 
 
 ------------------------------------------------------------------------------------------
 					random minor use functions - not sure if needed
