@@ -8,10 +8,11 @@ addpath(genpath(pwd))
 year = 2022 %2022;
 location='Success';
 datum_correction= [NaN] ;
-README_time_adjustment = 'Time was corrected to local AWST by adding 8 hours'%'Time was corrected to local AWST  by adding 19 hours for may, June and 12 hours for other months'
-Offset_from_UTC = '8';
+README_time_adjustment = 'Time was corrected to local AWST by adding 8 hours' %'Converted to +8 AWST, no extra adjustments needed' %'Time was corrected to local AWST by adding 8 hours'%'Time was corrected to local AWST  by adding 19 hours for may, June and 12 hours for other months'
+Offset_from_UTC = '8'; % input
 instrument='FPA_pressure_sensor'
-AnalysisMethod = 'zerocross' % 'zerocross' % 'spectral'
+AnalysisMethod = 'zerocross' %'zerocross' % 'zerocross' % 'spectral'
+save_raw_data      = 'Y'
 save_matfile       = 'Y'            % save the processed data to matfile
 save_matfig        = 'N';           % save the .fig files?
 print_fig          = 'Y';           % print to image file?
@@ -21,7 +22,13 @@ create_gapfree_time= 'N'            % to interpolate to perfect gap free time ve
 max_timegap_days   = 5/60/24        % maximum time gap (in das) to interpolate data across when create_gapfree_time= 'Y'; 10/3600/24 = 10 seconds %  NOT SURE HOW TO DEAL WITH THIS
 
 % whereput_combined_outputs=['/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2020_Stirling_CLEANED_v4/' location '_' num2str(year) '_processed_combined_wave_data'];
+
+% success
 whereput_combined_outputs=['/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_' num2str(year) '_' location '_CLEANED_v1/' location '_' num2str(year) '_processed_combined_wave_data'];
+
+% stirling
+% whereput_combined_outputs=['/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_' num2str(year) '_' location '_Connect_CLEANED_v1/' location '_' num2str(year) '_processed_combined_wave_data'];
+
 mkdir(whereput_combined_outputs)
 
 
@@ -35,7 +42,13 @@ for mo=1:12
 % 
 %     d(co)=dir(['/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2022_Stirling_CLEANED_v2/2022' sprintf('%02.f',mo) '_Cleaned_pressure_data_Stirling_processed_' AnalysisMethod '/FPA_pressure_sensor_Stirling_PROCESSED_DATA_2022' sprintf('%02.f',mo) '*']);
 
+% success
     d(co)=dir(['/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_' num2str(year-1) '-' num2str(year+1) '_' location '_CLEANED_v1/' num2str(year) sprintf('%02.f',mo) '_Cleaned_pressure_data_' location '_processed_' AnalysisMethod '/FPA_pressure_sensor_' location '_PROCESSED_DATA_' num2str(year) sprintf('%02.f',mo) '*']);
+
+% stirling
+%     d(co)=dir(['/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_' num2str(year) '-' num2str(year+1) '_' location '_Connect_CLEANED_v1/' num2str(year) sprintf('%02.f',mo) '_Cleaned_pressure_data_' location '_processed_' AnalysisMethod '/FPA_pressure_sensor_' location '_PROCESSED_DATA_' num2str(year) sprintf('%02.f',mo) '*']);
+
+
 end
 % dir();
 
@@ -43,6 +56,12 @@ m=matfile([d(1).folder filesep d(1).name]); % get first data to start concatinat
 d(1).name
 T_sl=m.T_sl; %Waves_output_Table
 Waves_output_Table=m.Waves_output_Table;
+switch save_raw_data
+    case 'Y'
+trimmed_time=m.trimmed_time;
+raw_trimmed_pressure=m.raw_trimmed_press;
+        
+end
 
 for i=2:length(d)
     m=[];
@@ -55,6 +74,11 @@ for i=2:length(d)
     
     Waves_output_Table=vertcat(Waves_output_Table,tmp_Waves_output_Table);
 
+    switch save_raw_data
+    case 'Y'
+    trimmed_time=[trimmed_time;m.trimmed_time];
+    raw_trimmed_pressure=[raw_trimmed_pressure;m.raw_trimmed_press];
+    end
 end
 
 
@@ -234,7 +258,7 @@ savefig2_ylh(save_matfig,print_fig,use_export_fig,img_type,fname)
  
 readme=['Hourly wave outputs saved as matlab table: Waves_output_Table; subsampled sealevel (pressure,tide,residual)saved in matlab table: T_sl. Timezone = UTC+' Offset_from_UTC]
 outf=[whereput_combined_outputs '/' location '_waves_hourly_' AnalysisMethod '_' datestr(mean(datenum(Waves_output_Table.timestr(1,:)),'omitnan'),'yyyy')];
-save(outf,'Waves_output_Table','T_sl','readme','README_time_adjustment')
+save(outf,'Waves_output_Table','T_sl','readme','README_time_adjustment',   'trimmed_time' , 'raw_trimmed_pressure');
                   
 outf_tname=[whereput_combined_outputs '/' location '_waves_hourly_' AnalysisMethod '_' datestr(mean(datenum(Waves_output_Table.timestr(1,:)),'omitnan'),'yyyy') '.csv'];
 writetable(Waves_output_Table,outf_tname,'Delimiter',',','QuoteStrings',true)
