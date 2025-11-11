@@ -1,5 +1,5 @@
 % Yasha Hetzel 13 April 2023
-% driver_read_save_stirling_pressure_v9_daily.m
+% driver_read_save_stirling_pressure_daily.m
 
 % Read and save raw DAILY [2021+] text files data for chari in monthly chunks from
 % Cockburn Sound Stirling channel marker data from Fremantle Ports
@@ -26,7 +26,7 @@
 % 20230619 yh
 % - added abiity to check for long time gaps for each file and then adjust
 % using long term mean rather than 5 mins
-
+% 20251111 yh updated to use function to read north mole data 
 
 clear all;
 clc;
@@ -47,10 +47,10 @@ addpath(genpath(pwd))
 %%-------------------------------------------------------------------------%
 
 years2do = [2022] % [2017 2018] % can be vector of years (for loop)
-months2do = [6] %[7 8]   % can be vector of months (e.g. [1:12] for loop)
+months2do = [1] %1:3[7 8]   % can be vector of months (e.g. [1:12] for loop)
 
 
-site= 'Success' %'Stirling % this is important for reading files and naming
+site= 'NorthMole' %'Stirling Success % t his is important for reading files and naming
 
 % input_directory='/Volumes/Margs_Clone/Pressure_sensor_data/Fremantle_Ports/Data_2022_Stirling'
 % output_directory=['/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2022_Stirling_CLEANED_v2']
@@ -59,26 +59,39 @@ site= 'Success' %'Stirling % this is important for reading files and naming
 % input_directory='/Volumes/Margs_Clone/Pressure_sensor_data/Fremantle_Ports/Data_2021_Stirling'
 % output_directory=['/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021_Stirling_CLEANED_v1']
 
-input_directory='/Volumes/Margs_Clone/Pressure_sensor_data/Fremantle_Ports/20230606_WAMSI_FPA_Success_Raw_Digiquartz_Data_2021-23/CombinedDataFeed'
-output_directory=['/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1']
+% Success good data timestamps
+% input_directory='/Volumes/Margs_Clone/Pressure_sensor_data/Fremantle_Ports/20230606_WAMSI_FPA_Success_Raw_Digiquartz_Data_2021-23/CombinedDataFeed'
+% output_directory=['/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2021-2023_Success_CLEANED_v1']
+
+input_directory='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/NorthMole/20220113'
+output_directory=['/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/NorthMole/Data_NorthMole_RAW_v1']
+
+
+% recent questionable timestamps Stirling
+% input_directory='/Volumes/Margs_Clone/Pressure_sensor_data/Fremantle_Ports/Stirling_2022-2023/Connect_Archive'
+% output_directory=['/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/processed_Stirling_waves_test/Data_2022-2023_Stirling_Connect_CLEANED_v1']
+
 
 
 % move problematic files to here:
 % % error_folder='/Volumes/Margs_Clone/Pressure_sensor_data/Fremantle_Ports/Data_2022_Stirling/error_folder'
 % error_folder='/Volumes/Margs_Clone/Pressure_sensor_data/Fremantle_Ports/Data_2021_Stirling/error_folder'
-error_folder='/Volumes/Margs_Clone/Pressure_sensor_data/Fremantle_Ports/20230606_WAMSI_FPA_Success_Raw_Digiquartz_Data_2021-23/CombinedDataFeed/error_folder'
+% error_folder='/Volumes/Margs_Clone/Pressure_sensor_data/Fremantle_Ports/20230606_WAMSI_FPA_Success_Raw_Digiquartz_Data_2021-23/CombinedDataFeed/error_folder'
+% error_folder='/Volumes/Margs_Clone/Pressure_sensor_data/Fremantle_Ports/Stirling_2022-2023/Connect_Archive/error_folder'
+error_folder='/Users/00068592/Documents/RESEARCH/OTHER_PEOPLE/CHARI/Cockburn_pressure_sensor/NorthMole/error_folder'
+
 
 sRateHz=2; % sampling rate in Hz
 
-fix_offset = 'Y'      % Fix vertical offsets between files when reading in based on 5 min ends of data or long term mean
+fix_offset = 'N'      % Fix vertical offsets between files when reading in based on 5 min ends of data or long term mean
 
-check_data_percent ='Y' % Check to see how much data exists in file; move to error folder and ignore if below threshold
+check_data_percent ='N' % Check to see how much data exists in file; move to error folder and ignore if below threshold
 min_threshold_good=0.98 % keep file if >99% good data
 
-remove_outliers='Y'     % replace outliers with nans? This uses moving window to identify outliers.... makes it much slower.
+remove_outliers='N'     % replace outliers with nans? This uses moving window to identify outliers.... makes it much slower.
 outlier_stds=10          % use this number of standard deviations from mean to identify bad data [10 is good...needs to be big to avoid throwing out real waves]
 out_window = [600 600]  % moving window definition [behind infront] [600 600] is centred 10-minute window with 2 Hz data. If only single number, window is balanced
-replace_nans='Y'        % replace nans  by interpolation
+replace_nans='N'        % replace nans  by interpolation
 maxgap_secs=3700        % maximum gap in seconds to interpolate across
 
 plot_combined = 'Y'
@@ -174,8 +187,15 @@ for year = years2do
             switch site
                 case 'Stirling'
             [dat ts p] = import_daily_pressure(filename); %
+                case 'Stirling2'
+                    [dat ts p] = import_daily_pressure_success(filename); %
                 case 'Success'
             [dat ts p] = import_daily_pressure_success(filename); %
+            
+                case 'NorthMole'
+            [dat ts p] = import_daily_pressure_NorthMole(filename); %
+            
+            
             end
             
             [warnMsg, warnId] = lastwarn;
@@ -366,7 +386,7 @@ for year = years2do
         
         % save
         
-        if strcmpi(replace_nans,'Y') | strcmpi(replace_nans,'remove_outliers','Y') | strcmpi(fix_offset,'Y')
+        if strcmpi(replace_nans,'Y') | strcmpi('remove_outliers','Y') | strcmpi(fix_offset,'Y')
            processing_applied='Cleaned';
         else
             processing_applied='Raw';    
