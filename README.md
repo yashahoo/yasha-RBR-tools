@@ -23,43 +23,43 @@ Uses ocn toolbox to get waves which allows for pressure attenuation correction.
 %  https://oceanlyz.readthedocs.io/en/latest/
 % 
 ## Contents
-process_RBR_waves_sealevel.m - main driver for complete wave analysis and averaging of water level, filtering,tidal analysis, save outputs to hourly text files
+process_RBR_waves_sealevel.m - main driver for complete wave analysis and averaging of water level, filtering,tidal analysis, save outputs to hourly text files  
 
-%% process waves using chari's scripts made into a function
-get_chari_wave_analysis.m
-autospec.m
-opclevel.m
-oppsd.m
-oppsd2.m
-opsmooth.m
-periodo.m
-get_tidespecft.m - function to produce time-frequency plots from sea level data
-wavenumber.m
-wavepar.m
-wavepar2_yh.m
-wavepar_yh.m
+%% process waves using chari's scripts made into a function  
+get_chari_wave_analysis.m  
+autospec.m  
+opclevel.m  
+oppsd.m  
+oppsd2.m  
+opsmooth.m  
+periodo.m  
+get_tidespecft.m - function to produce time-frequency plots from sea level data  
+wavenumber.m  
+wavepar.m  
+wavepar2_yh.m  
+wavepar_yh.m  
 
-interp1gap.m
-interp_r.m
-lanczosfilter.m
-lp_filter.m
-highpass.m
-nanmean.m
-newdatestr.m
-fillgapYLH.m
-get_beginfinish.m -interactively select start and finish times
-get_finish.m -interactively select only finish time (start at beginning)
-get_outliers_yh.m
-date2doy.m
-rotateXLabels.m
-savefig2_ylh.m
+interp1gap.m  
+interp_r.m  
+lanczosfilter.m  
+lp_filter.m  
+highpass.m  
+nanmean.m  
+newdatestr.m  
+fillgapYLH.m  
+get_beginfinish.m -interactively select start and finish times  
+get_finish.m -interactively select only finish time (start at beginning)  
+get_outliers_yh.m  
+date2doy.m  
+rotateXLabels.m  
+savefig2_ylh.m  
 
-read_RBRyh.m - old version for reading rsk files. outdated, but works on older instruments. replaced by v2
-read_RBRyh_v2.m - read raw rsk file and save to netcdf
+read_RBRyh.m - old version for reading rsk files. outdated, but works on older instruments. replaced by v2  
+read_RBRyh_v2.m - read raw rsk file and save to netcdf  
 
-importDOTfile.m - read department of transport 5min tide gauge file
-process_DOT_5min_waterlevel.m - process DOT tide gauge file
-detrend_notes_yasha.m - how to detrend sea level, etc.
+importDOTfile.m - read department of transport 5min tide gauge file  
+process_DOT_5min_waterlevel.m - process DOT tide gauge file  
+detrend_notes_yasha.m - how to detrend sea level, etc.  
 
 ##								    Toolboxes used
 t_tide_v1/ - tidal analysis  
