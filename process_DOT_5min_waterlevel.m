@@ -7,27 +7,36 @@ clear all; close all;clc
 
 %% settings  
 
-infile='/Users/00068592/Documents/RESEARCH/DATA/MEASURED/RBRpressure_sensors/20220818_RBR_ABB_DUNS_EB_StuBarr/GEO_Jan-Aug_2022.txt';
-
-startdate=datenum(2022,1,1);
-finishdate=datenum(2022,9,22);
-whereput='/Volumes/Margs_Clone/RBRpressure_sensors/202201-09_PortGeo_tidegauge/'; %202207-09_PortGeo_tidegauge
+% infile='/Users/00068592/Documents/RESEARCH/DATA/MEASURED/RBRpressure_sensors/20220818_RBR_ABB_DUNS_EB_StuBarr/GEO_Jan-Aug_2022.txt';
+infile='/Volumes/Margs_Clone5/Pressure_sensor_data/RBRpressure_sensors/SN14229_StuBarr_Bunbury_PelicanPoint/Bunbury_tide_gauge.mat'
+location='Bunbury_inner'
+startdate=datenum(2023,11,1);
+finishdate=datenum(2024,1,31);
+% whereput='/Volumes/Margs_Clone/RBRpressure_sensors/202201-09_PortGeo_tidegauge/'; %202207-09_PortGeo_tidegauge
+whereput='/Volumes/Margs_Clone5/RBRpressure_sensors/20231101-20240131_Bunbury_tidegauge/'; %202207-09_PortGeo_tidegauge
 mkdir(whereput);
 
 save_matfile       = 'N'            % save the processed data to matfile
 save_matfig        = 'N';           % save the .fig files?
 print_fig          = 'Y';           % print to image file?
-use_export_fig     = 'N'            % if print_fig ='Y' -->  'N' uses native matlab print function (default) OR 'Y' uses export_fig to make nice plots
+use_export_fig     = 'Y'            % if print_fig ='Y' -->  'N' uses native matlab print function (default) OR 'Y' uses export_fig to make nice plots
 img_type           = {'pdf','png'}; % if print_fig ='Y' -->  {'pdf','png','eps'} % options. can be multiple. pdf will not save if native matlab unless edit function
 
-%% read data
+%% read data (from DOT text)
+% 
+% [z, t, junk] = importDOTfile(infile, [52, Inf]);
+% z(isnan(z))=[];t(isnan(t))=[];
+% tt=num2str(t,'%8.4f');
+% mtime=datenum(tt,'yyyymmdd.HHMM');
+% 
+% z=z./100;
 
-[z, t, junk] = importDOTfile(infile, [52, Inf]);
-z(isnan(z))=[];t(isnan(t))=[];
-tt=num2str(t,'%8.4f');
-mtime=datenum(tt,'yyyymmdd.HHMM');
 
-z=z./100;
+%% if using saved matfile for bunbury
+load(infile)
+z=BT.inner; % or Bn10 , Bn3
+mtime=datenum(BT.time);
+
 %% plot data
 
 
@@ -132,7 +141,7 @@ plot(Htime,Hresidual,'k');
 legend('5min','predicted','lowpass','Hourly avg','residual','Hourly residual',' ','location','best')
 plot([t2(1) t2(end)],[0 0],'color',[.5 .5 .5],'linewidth',0.5)
 ylabel('Sea level (m CD)')
-title('DOT Port Geographe tide gauge')
+title(['DOT ' location ' tide gauge'])
 xlabel([datestr(mean(Htime),'YYYY') ' (UTC+8)'])
 grid on
 box on
@@ -148,7 +157,7 @@ ax.FontSize=14;
 
 % fname=['/Users/00068592/Documents/RESEARCH/DATA/MEASURED/RBRpressure_sensors/20220818_RBR_ABB_DUNS_EB_StuBarr/DOT_PortGeographe_tide_gauge_' datestr(t2(1),'yyyymmdd') '-' datestr(t2(end),'yyyymmdd')];
 % fname=['/Users/00068592/Documents/RESEARCH/DATA/MEASURED/RBRpressure_sensors/20220818_RBR_ABB_DUNS_EB_StuBarr/DOT_PortGeographe_tide_gauge_' datestr(ax.XLim(1),'yyyymmdd') '-' datestr(ax.XLim(end),'yyyymmdd')];
-fname=[whereput 'DOT_PortGeographe_tide_gauge_' datestr(t2(1),'yyyymmdd') '-' datestr(t2(end),'yyyymmdd')];
+fname=[whereput 'DOT_' location '_tide_gauge_' datestr(t2(1),'yyyymmdd') '-' datestr(t2(end),'yyyymmdd')];
 
 savefig2_ylh(save_matfig,print_fig,use_export_fig,img_type,fname)
 
@@ -269,9 +278,10 @@ text(f3,ytop,'15 min','fontsize',[12])
 % plot([f5 f5],ylim,'k:')
 % text(f5,.6,'5 sec','fontsize',[12])
 % title([instrument ' ' location],'interpreter','none')
-
+title(['DOT ' location ' tide gauge']
 % fname=['/Users/00068592/Documents/RESEARCH/DATA/MEASURED/RBRpressure_sensors/20220818_RBR_ABB_DUNS_EB_StuBarr/DOT_PortGeographe_tide_gauge_SPECTRA_' datestr(t2(1),'yyyymmdd') '-' datestr(t2(end),'yyyymmdd')];
-fname=[whereput 'DOT_PortGeographe_tide_gauge_SPECTRA_' datestr(t2(1),'yyyymmdd') '-' datestr(t2(end),'yyyymmdd')];
+% fname=[whereput 'DOT_PortGeographe_tide_gauge_SPECTRA_' datestr(t2(1),'yyyymmdd') '-' datestr(t2(end),'yyyymmdd')];
+fname=[whereput 'DOT_' location '_tide_gauge_SPECTRA_' datestr(t2(1),'yyyymmdd') '-' datestr(t2(end),'yyyymmdd')];
 savefig2_ylh(save_matfig,print_fig,use_export_fig,img_type,fname)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -368,7 +378,7 @@ Time_WST=cellstr(timestr);
 
     T = table(timestr,z,tide,residual);
 
-outf_tname=[whereput 'DOT_PortGeographe_tide_gauge_'  datestr(mtime(1),'yyyymmdd') '-' datestr(mtime(end),'yyyymmdd') '_5_minutes.csv'];
+outf_tname=[whereput 'DOT_' location '_tide_gauge_'  datestr(mtime(1),'yyyymmdd') '-' datestr(mtime(end),'yyyymmdd') '_5_minutes.csv'];
 writetable(T,outf_tname,'Delimiter',',','QuoteStrings',true)
 
 disp('5min sea level data saved to csv text file')
