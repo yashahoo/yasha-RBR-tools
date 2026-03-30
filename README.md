@@ -1,7 +1,7 @@
 # yasha-RBR-tools
 Development Matlab toolbox for processing of pressure sensor data from RBR or other instruments including wave calculations
 
-Derived from Yasha-RBR_tools_v9 (latest working version)
+This toolbox supercedes Yasha-RBR_tools_v9 
  
 Toolbox to read rbr pressure sensor data and calculate waves and sealevel variables
 Uses ocn toolbox to get waves which allows for pressure attenuation correction.
