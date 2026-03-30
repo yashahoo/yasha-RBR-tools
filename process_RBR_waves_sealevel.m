@@ -8,7 +8,7 @@
 % with the processed data as matfile (optional) or the hourly wave data as a csv text file
 % **There are a lot of m-files required so you need to set the path to make
 % sure all the m-files in the yasha_RBR_tools are available.
-% 
+
 %  Waves now correctly calculated with pressure response for depth using
 %  Oceanlyz toolbox
 %  http://zarmesh.com/wp-content/uploads/2016/05/Wind-wave-analysis-in-depth-limited-water-using-OCEANLYZ-A-MATLAB-toolbox.pdf
@@ -110,6 +110,12 @@ addpath(genpath(pwd))
 % datum_correction= [1.74-1.2]  ; site_depth=1.5;  location='OldDunsborough'; rawfile='/Volumes/Margs_Clone/RBRpressure_sensors/20221027_Busselton_RBR_ABB_DUNS_EB_StuBarr/DUNS_D2_206857_20221027_1254.rsk' %done
 % datum_correction= [1.9-1.5] ;     site_depth=1.5;  location='EastBusselton'; rawfile='/Volumes/Margs_Clone/RBRpressure_sensors/20221027_Busselton_RBR_ABB_DUNS_EB_StuBarr/EastBusselton_D2_209847_20221027_1053.rsk' % done
 
+% Deployment 3 - StuBarr
+% datum_correction=[1.54-0.95] ; site_depth=1.5;  location='Abbey'; rawfile='/Volumes/Margs_Clone5/Pressure_sensor_data/RBRpressure_sensors/20221130_Busselton_RBR_ABB_DUNS_D3_StuBarr/ABBEY_D3_206860_20221130_1039.rsk'
+% datum_correction= [1.74-1.2]  ; site_depth=1.5;  location='OldDunsborough'; rawfile='/Volumes/Margs_Clone5/Pressure_sensor_data/RBRpressure_sensors/20221130_Busselton_RBR_ABB_DUNS_D3_StuBarr/DUNS_D3_206857_20221130_1426.rsk' %done
+% datum_correction= [1.9-1.5] ;     site_depth=1.5;  location='EastBusselton'; rawfile='/Volumes/Margs_Clone5/RBRpressure_sensors/20221027_Busselton_RBR_ABB_DUNS_EB_StuBarr/EastBusselton_D2_209847_20221027_1053.rsk' % done
+
+
 % Deployment 5 - StuBarr
 % datum_correction=[1.54-0.95] ; site_depth=1.5;  location='Abbey'; rawfile='/Volumes/Margs_Clone/RBRpressure_sensors/SN_124229_StuBarr_Abbey_Busselton_20210206-20210504/ABBEY_D5_124229_20230619_0854.rsk'
 
@@ -132,10 +138,14 @@ addpath(genpath(pwd))
 
 % datum_correction=[NaN] ; site_depth=1;  location='Toby'; rawfile='/Volumes/Margs_Clone/Pressure_sensor_data/RBRpressure_sensors/202308_StuBarr_Geographe_Bay/RBR02_Toby_Inlet_206860-20230829/206860_20230829_1133.rsk' % this locations was cut off from ocean at start and end of file.
 
-% datum_correction=[-.37] ; site_depth=3;  location='PelicanPoint'; rawfile='/Volumes/Margs_Clone5/Pressure_sensor_data/RBRpressure_sensors/SN14229_StuBarr_Bunbury_PelicanPoint/124229_20240201_0922.rsk'
+% datum_correction=[-.37] ; site_depth=3;  location='PelicanPoint2'; rawfile='/Volumes/Margs_Clone5/Pressure_sensor_data/RBRpressure_sensors/SN14229_StuBarr_Bunbury_PelicanPoint/124229_20240201_0922.rsk'
 
-% datum_correction=[NaN] ; site_depth=1;  location='HamelinPool_SouthernPile'; rawfile='/Volumes/Margs_Clone5/Pressure_sensor_data/RBRpressure_sensors/HamelinPool/SN124228_Hamelin_pool_southern_pile_20250323/124228_20250323_1514_Boardwalk_Southern_Pile.rsk'
-datum_correction=[NaN] ; site_depth=1;  location='HamelinPool_NorthernPile'; rawfile='/Volumes/Margs_Clone5/Pressure_sensor_data/RBRpressure_sensors/HamelinPool/SN206853_Hamelin_pool_northern_pile_20250323/206853_20250323_1533_Boardwalk_Northern_Pile.rsk'
+% % datum_correction=[NaN] ; site_depth=1;  location='HamelinPool_SouthernPile'; rawfile='/Volumes/Margs_Clone5/Pressure_sensor_data/RBRpressure_sensors/HamelinPool/SN124228_Hamelin_pool_southern_pile_20250323/124228_20250323_1514_Boardwalk_Southern_Pile.rsk'
+% datum_correction=[NaN] ; site_depth=1;  location='HamelinPool_NorthernPile'; rawfile='/Volumes/Margs_Clone5/Pressure_sensor_data/RBRpressure_sensors/HamelinPool/SN206853_Hamelin_pool_northern_pile_20250323/206853_20250323_1533_Boardwalk_Northern_Pile.rsk'
+
+% datum_correction= [NaN]  ; site_depth=8;  location='BI4B';
+% rawfile='/Users/00068592/Documents/RESEARCH/DATA/MEASURED/RBRpressure_sensors/SN124024_BI4B_20180413_chari_test/124024_20180413_0922_BI4B.rsk' %was 077823 incorrectly 
+datum_correction= [NaN]  ; site_depth=8;  location='CH3B'; rawfile='/Users/00068592/Documents/RESEARCH/DATA/MEASURED/RBRpressure_sensors/SN77286_CH3B_20180413_chari_test/077286_20180413_0922_CH3B.rsk'
 %%-------------------------------------------------------------------------%
 
 % EXAMPLE measurements required to change datum from MSL to Chart datum
@@ -185,7 +195,7 @@ calculate_IG       = 'Y'            % calculate Infragravity waves (shoudl be 'Y
 get_time_freq      = 'Y'            % use chari's function to calculate time-frequency plot
 save_subhr_sealevel_only_txt = 'N'  % for cases where cannot get tide and residual, save only sub-hourly sealevel data to csv text file
 do_highpass_filter = 'Y'            % do highpass filter to remove waves > max_period
-plot_highpass_weeks= 'Y'            % plot weekly highpass filter (was useful to look at boatwakes in albany)
+plot_highpass_weeks= 'N'            % plot weekly highpass filter (was useful to look at boatwakes in albany)
 save_matfile       = 'N'            % save the processed data to matfile
 save_matfig        = 'N';           % save the .fig files?
 print_fig          = 'Y';           % print to image file?
@@ -197,8 +207,8 @@ img_type           = {'pdf','png'}; % if print_fig ='Y' -->  {'pdf','png','eps'}
 %%-------------------------------------------------------------------------%
 remove_dynamic_atm = 'N'            % Y if you have mslp observations to correct data... if N it will use subtracted 10.1325 db
 % load air pressure data [ and get mslp data for closest station)
-% must manualy define which station to use (e.g. 26 below is Busselton Airport)
- bom_index=27% % 26;
+% must manualy define which station to use (e.g. 24below is Busselton Airport)
+ bom_index=24% % 26;
 
 %%-------------------------------------------------------------------------%
 %      Wave calculation settings [for oceanlyz toolbox]
@@ -207,13 +217,13 @@ remove_dynamic_atm = 'N'            % Y if you have mslp observations to correct
 %%-------------------------------------------------------------------------%
 InputType='pressure' %'waterlevel' %'pressure'   %'waterlevel' %           % Data input ['pressure'] or  'waterlevel'. If pressure, the signal attenuation with depth will be applied [recommended].
 OutputType='wave+waterlevel' %'wave' %'wave+waterlevel'      % ['wave'], ['wave+waterlevel'];
-AnalysisMethod='spectral' %'spectral' %'zerocross' %'spectral' %'zerocross'  %'zerocross' %'spectral'         % Wave calculation method. 'zerocross' or ['spectral']. use zerocross if you want Hs, but very similar to Hm0 and swell/sea are useful
+AnalysisMethod='zerocross' %'spectral' %'spectral' %'zerocross' %'spectral' %'zerocross'  %'zerocross' %'spectral'         % Wave calculation method. 'zerocross' or ['spectral']. use zerocross if you want Hs, but very similar to Hm0 and swell/sea are useful
 burst_duration=3500;              % Interval of time window (in seconds) over which to calculate waves
 fs=sample_rate_hz;                % Frequency of data in Hz
-heightfrombed= 2 %site_depth-1 ;  % [Default=0]   % height of instrument above bed (m). Only required if ocn.InputType='pressure' and ocn.AnalysisMethod='spectral'.If unknown assume = 0
+heightfrombed= site_depth-1 %2 %site_depth-1 ;  % [Default=0]   % height of instrument above bed (m). Only required if ocn.InputType='pressure' and ocn.AnalysisMethod='spectral'.If unknown assume = 0
 dispout='no';                     % Display output of calculations at each burst ('yes or 'no')
 Rho=1024;                         % Seawater density (Varies)
-SeparateSeaSwell='no'            % 'yes or 'no' (only works with spectral)
+SeparateSeaSwell='yes'            % 'yes or 'no' (only works with spectral)
 fmaxswell=1/8 %0.25;              % Maximum swell frequency (spectral only). 1/Period (ie. minimum period a swell can have). It should be between 0 and (fs/2). Only required if SeparateSeaSwell='yes' and AnalysisMethod='spectral'
 fpminswell=1/25 %0.1;             % Minimum swell frequency (spectral only)
 max_period= 25;                   % max period to use in wave calculations and filtering
@@ -228,6 +238,11 @@ max_period= 25;                   % max period to use in wave calculations and f
 % finish=datenum(2022,8,16,9,11,31);
 % begin=datenum('19-Dec-2023 11:56:46');
 % finish=datenum('01-Feb-2024 08:49:07');
+% begin=datenum('19-Dec-2023 12:00:00');
+% finish=datenum('31-Jan-2024');
+% begin=datenum('27-Oct-2022 13:09:41')
+% finish=datenum('30-Nov-2022 13:56:15')
+
 begin=NaN;
 finish=NaN;
 
@@ -841,7 +856,7 @@ switch calculate_waves
                 xlabel(datestr(mean(burst_times),'YYYY'))
                 title([instrument ' ' location ],'interpreter','none')
                 fname=[whereput '/' instrument '_' location '_WAVE_HEIGHT_' datestr(xlims(1),'yyyymmdd') '-' datestr(xlims(2),'yyyymmdd')];
-                fname=[whereput '/124229_PelicanPoint_SEALEVEL_ChartDatum_1mins_20231219-20240201-WITH_INNERHARBOUR'];
+%                
                 % print('-dpng','-r200', fname);
                 % print('-dpdf', '-painters', fname);
                 %         export_fig(fname,'-pdf','-png','-transparent')
