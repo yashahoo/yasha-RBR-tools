@@ -145,7 +145,8 @@ addpath(genpath(pwd))
 
 % datum_correction= [NaN]  ; site_depth=8;  location='BI4B';
 % rawfile='/Users/00068592/Documents/RESEARCH/DATA/MEASURED/RBRpressure_sensors/SN124024_BI4B_20180413_chari_test/124024_20180413_0922_BI4B.rsk' %was 077823 incorrectly 
-datum_correction= [NaN]  ; site_depth=8;  location='CH3B'; rawfile='/Users/00068592/Documents/RESEARCH/DATA/MEASURED/RBRpressure_sensors/SN77286_CH3B_20180413_chari_test/077286_20180413_0922_CH3B.rsk'
+% datum_correction= [NaN]  ; site_depth=8;  location='CH3B'; rawfile='/Users/00068592/Documents/RESEARCH/DATA/MEASURED/RBRpressure_sensors/SN77286_CH3B_20180413_chari_test/077286_20180413_0922_CH3B.rsk'
+datum_correction= [NaN]  ; site_depth=8;  location='CH4B'; rawfile='/Users/00068592/Documents/RESEARCH/DATA/MEASURED/RBRpressure_sensors/SN077823_CH4B/077823_20180413_0922_CH4B.rsk' % third file chari shared
 %%-------------------------------------------------------------------------%
 
 % EXAMPLE measurements required to change datum from MSL to Chart datum
