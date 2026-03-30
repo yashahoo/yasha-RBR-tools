@@ -4,13 +4,13 @@
 
 
 clear all; close all;clc
-
+addpath('/opt/homebrew/Cellar/ghostscript/10.05.1/bin')
 %% settings  
 
 % infile='/Users/00068592/Documents/RESEARCH/DATA/MEASURED/RBRpressure_sensors/20220818_RBR_ABB_DUNS_EB_StuBarr/GEO_Jan-Aug_2022.txt';
 infile='/Volumes/Margs_Clone5/Pressure_sensor_data/RBRpressure_sensors/SN14229_StuBarr_Bunbury_PelicanPoint/Bunbury_tide_gauge.mat'
 location='Bunbury_inner'
-startdate=datenum(2023,11,1);
+startdate=datenum(2023,12,19,12,0,0);
 finishdate=datenum(2024,1,31);
 % whereput='/Volumes/Margs_Clone/RBRpressure_sensors/202201-09_PortGeo_tidegauge/'; %202207-09_PortGeo_tidegauge
 whereput='/Volumes/Margs_Clone5/RBRpressure_sensors/20231101-20240131_Bunbury_tidegauge/'; %202207-09_PortGeo_tidegauge
@@ -35,6 +35,8 @@ img_type           = {'pdf','png'}; % if print_fig ='Y' -->  {'pdf','png','eps'}
 %% if using saved matfile for bunbury
 load(infile)
 z=BT.inner; % or Bn10 , Bn3
+% z=BT.Bn10; % or , Bn3
+% z=BT.Bn3; % or Bn10 , 
 mtime=datenum(BT.time);
 
 %% plot data
@@ -167,6 +169,8 @@ savefig2_ylh(save_matfig,print_fig,use_export_fig,img_type,fname)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 figure; % this is a dud figure created so it doesn't appear by default in previous figure;
 % data=p(goodi); % for depth data (observed)
+
+z2=z(keepi);
 data=z2;
 
 % data=zeros(2431001,1);
@@ -218,7 +222,8 @@ disp('Spectra calculated')
 fh=figure;
 fh.Color='w';
 %subplot(221)
-loglog(f,Sxx,'k-','linewidth',1.5)
+% loglog(f,Sxx,'k-','linewidth',1.5)
+loglog(f,Sxx,'k-','linewidth',1.5,'color','r')
 hold on
 %axis([1e-7 1e-2 1e0 1e4])
 ylabel('Spectral Density (m^2/Hz)')
@@ -247,10 +252,15 @@ f4=1/(4*60*60);
 plot([f4 f4],ylim,'k:')
 text(f4,ymiddle+100,' 4h','fontsize',[12])
 
-% % 2hr
-% f2=1/(1*60*60);
-% plot([f2 f2],ylim,'k:')
-% text(f2,ymiddle,' 1h','fontsize',[12])
+% % 1hr
+% f1=1/(1*60*60);
+% plot([f1 f1],ylim,'k:')
+% text(f1,ymiddle,' 1h','fontsize',[12])
+
+%2hr
+f2=1/(2*60*60);
+plot([f2 f2],ylim,'k:')
+text(f2,ymiddle+10,' 2h','fontsize',[12])
 
 % 15 mins
 f3=1/((15/60)*60*60);
@@ -278,10 +288,11 @@ text(f3,ytop,'15 min','fontsize',[12])
 % plot([f5 f5],ylim,'k:')
 % text(f5,.6,'5 sec','fontsize',[12])
 % title([instrument ' ' location],'interpreter','none')
-title(['DOT ' location ' tide gauge']
+title(['DOT ' location ' tide gauge'],'interpreter','none')
 % fname=['/Users/00068592/Documents/RESEARCH/DATA/MEASURED/RBRpressure_sensors/20220818_RBR_ABB_DUNS_EB_StuBarr/DOT_PortGeographe_tide_gauge_SPECTRA_' datestr(t2(1),'yyyymmdd') '-' datestr(t2(end),'yyyymmdd')];
 % fname=[whereput 'DOT_PortGeographe_tide_gauge_SPECTRA_' datestr(t2(1),'yyyymmdd') '-' datestr(t2(end),'yyyymmdd')];
 fname=[whereput 'DOT_' location '_tide_gauge_SPECTRA_' datestr(t2(1),'yyyymmdd') '-' datestr(t2(end),'yyyymmdd')];
+% fname=[whereput 'DOT_RBR_compare_' location '_tide_gauge_SPECTRA_' datestr(t2(1),'yyyymmdd') '-' datestr(t2(end),'yyyymmdd')];
 savefig2_ylh(save_matfig,print_fig,use_export_fig,img_type,fname)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
